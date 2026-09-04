@@ -1,0 +1,44 @@
+.history-container {
+  padding: 20px;
+}
+
+.table-wrapper {
+  max-height: 500px;        /* ปรับขนาดความสูงได้ */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.result.real {
+  color: green;
+  font-weight: bold;
+}
+
+.result.fake {
+  color: red;
+  font-weight: bold;
+}
+
+.delete-btn {
+  background-color: crimson;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.delete-btn:hover {
+  background-color: darkred;
+}

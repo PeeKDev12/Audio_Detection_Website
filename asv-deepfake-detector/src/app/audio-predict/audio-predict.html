@@ -1,0 +1,278 @@
+<div class="predict-container">
+  <h2>Deepfake Audio Prediction</h2>
+
+  <!-- Upload -->
+  <div class="file-upload">
+    <label class="custom-file-upload">
+      <input #fileInput type="file" accept="audio/*" (change)="onFileSelected($event)" />
+      📁 Choose File
+    </label>
+
+    <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+
+    <button class="clear-btn" *ngIf="selectedFile" (click)="clearFile(fileInput)">
+      ❌ Clear
+    </button>
+  </div>
+
+  <!-- Preview -->
+  <audio controls *ngIf="audioUrl">
+    <source [src]="audioUrl" type="audio/wav" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- Predict -->
+  <button class="predict-btn" (click)="submitFile()" [disabled]="!selectedFile || loading">
+    {{ loading ? 'Predicting…' : 'Predict' }}
+  </button>
+
+  <!-- Error -->
+  <div class="error" *ngIf="errorMsg">
+    <strong>Error:</strong> {{ errorMsg }}
+  </div>
+
+  <!-- ================= Unified Result Table ================= -->
+  <div class="result-section" *ngIf="lastFilename">
+    <h3 class="file-title">📊 Result of {{ lastFilename }}</h3>
+
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Reference</th>
+          <th>Trained With</th>
+          <th>Reported Accuracy</th>
+          <th>Prediction</th>
+          <th>Confidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ===== PA ===== -->
+        <ng-container *ngIf="paItem">
+          <tr>
+            <td>PA HT20%</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354625</td>
+
+            <!-- Trained With (PA) -->
+            <td class="trained-with">
+              <span class="cell-text">
+                ResNet34 + LFCC
+                <span class="cell-note-inline">{{ trainWithMsgPA }}</span>
+              </span>
+            </td>
+
+            <!-- Reported Accuracy (PA) — removed the 'ResNet34 + LFCC' label -->
+            <td class="acc-report">
+              <span class="cell-text">
+                <span class="cell-note-inline">{{ accMsgPA }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(paItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(paItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(paItem) != null ? (toPct(paItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== LA ===== -->
+        <ng-container *ngIf="laItem">
+          <tr>
+            <td>LA HT20%</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354625</td>
+
+            <!-- Trained With (LA) -->
+            <td class="trained-with">
+              <span class="cell-text">
+                ResNet34 + LFCC
+                <span class="cell-note-inline">{{ trainWithMsgLA }}</span>
+              </span>
+            </td>
+
+            <!-- Reported Accuracy (LA) — removed the 'ResNet34 + LFCC' label -->
+            <td class="acc-report">
+              <span class="cell-text">
+                <span class="cell-note-inline">{{ accMsgLA }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(laItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(laItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(laItem) != null ? (toPct(laItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== LFCC-MMS ===== -->
+        <ng-container *ngIf="lfccMmsItem">
+          <tr>
+            <td>LFCC-MMS+Genuine</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354956</td>
+
+            <td class="trained-with">
+              <span class="cell-text">
+                LCNN + LFCC-MMS + Genuine
+                <span class="cell-note-inline">{{ trainWithMsgLFCCMMS }}</span>
+              </span>
+            </td>
+
+            <td class="acc-report">
+              <span class="cell-text">
+
+                <span class="cell-note-inline">{{ accMsgLFCCMMS }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(lfccMmsItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(lfccMmsItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(lfccMmsItem) != null ? (toPct(lfccMmsItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== MFCC-MMS ===== -->
+        <ng-container *ngIf="mfccMmsItem">
+          <tr>
+            <td>MFCC-MMS+Genuine</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354956</td>
+
+            <td class="trained-with">
+              <span class="cell-text">
+                LCNN + MFCC-MMS + Genuine
+                <span class="cell-note-inline">{{ trainWithMsgMFCCMMS }}</span>
+              </span>
+            </td>
+
+            <td class="acc-report">
+              <span class="cell-text">
+
+                <span class="cell-note-inline">{{ accMsgMFCCMMS }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(mfccMmsItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(mfccMmsItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(mfccMmsItem) != null ? (toPct(mfccMmsItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== LFCC-VAJA ===== -->
+        <ng-container *ngIf="lfccVajaItem">
+          <tr>
+            <td>LFCC-VAJA+Genuine</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354956</td>
+
+            <td class="trained-with">
+              <span class="cell-text">
+                LCNN + LFCC + VAJA + Genuine
+                <span class="cell-note-inline">{{ trainWithMsgLFCCVAJA }}</span>
+              </span>
+            </td>
+
+            <td class="acc-report">
+              <span class="cell-text">
+
+                <span class="cell-note-inline">{{ accMsgLFCCVAJA }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(lfccVajaItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(lfccVajaItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(lfccVajaItem) != null ? (toPct(lfccVajaItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== MFCC-VAJA ===== -->
+        <ng-container *ngIf="mfccVajaItem">
+          <tr>
+            <td>MFCC-VAJA+Genuine</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354956</td>
+
+            <td class="trained-with">
+              <span class="cell-text">
+                LCNN + MFCC + VAJA + Genuine
+                <span class="cell-note-inline">{{ trainWithMsgMFCCVAJA }}</span>
+              </span>
+            </td>
+
+            <td class="acc-report">
+              <span class="cell-text">
+
+                <span class="cell-note-inline">{{ accMsgMFCCVAJA }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(mfccVajaItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(mfccVajaItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(mfccVajaItem) != null ? (toPct(mfccVajaItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <!-- ===== LFCC generic (/predict_lfcc_1) ===== -->
+        <ng-container *ngIf="lfccItem">
+          <tr>
+            <td>LFCC Mixed</td>
+            <td>10.1109/iSAI-NLP60301.2023.10354956</td>
+
+            <td class="trained-with">
+              <span class="cell-text">
+
+                <span class="cell-note-inline">{{ trainWithMsgLFCC }}</span>
+              </span>
+            </td>
+
+            <td class="acc-report">
+              <span class="cell-text">
+                LCNN + LFCC
+                <span class="cell-note-inline">{{ accMsgLFCC }}</span>
+              </span>
+            </td>
+
+            <td class="pred-cell">
+              <span [ngClass]="normLabel(lfccItem.label) === 'Real' ? 'badge-real' : 'badge-fake'">
+                {{ normLabel(lfccItem.label) === 'Real' ? '🟢 Real' : '🔴 Fake' }}
+              </span>
+            </td>
+
+            <td class="acc-cell">
+              {{ toPct(lfccItem) != null ? (toPct(lfccItem) | number:'1.2-2') + '%' : '-' }}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>

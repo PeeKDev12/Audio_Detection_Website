@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+tensorflow
+sqlalchemy
+pydantic
+python-multipart
+scipy
+soundfile
+spafe
+librosa
