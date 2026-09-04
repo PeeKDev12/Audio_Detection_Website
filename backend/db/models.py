@@ -1,7 +1,7 @@
-# database/models.py
+﻿import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Float
-import datetime
-from database.database import Base
+from db.session import Base
+
 
 class User(Base):
     __tablename__ = "users"
@@ -11,11 +11,12 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
 
+
 class Prediction(Base):
     __tablename__ = "predictions"
 
     id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String)
-    label = Column(String)  # ✅ สำคัญ
-    confidence = Column(Float)  # ✅ สำคัญ
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    filename = Column(String, nullable=False)
+    label = Column(String, nullable=False)  # "Real" or "Fake"
+    confidence = Column(Float, nullable=False)  # 0..1
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
