@@ -1,0 +1,93 @@
+##### TECHSTACK #####
+
+  ### Frontend
+
+  • React 19 – UI library
+  • TypeScript – Strongly typed programming language
+  • Vite – Frontend build tool and development server
+  • Tailwind CSS – Utility-first CSS framework (with custom Neumorphism design system)
+  • PostCSS & Autoprefixer – CSS transformation and vendor prefixing
+  • Framer Motion – UI animations and modal transitions
+  • WaveSurfer.js – Interactive audio waveform visualizer and player
+  • Lucide React – Icon library
+  • Axios – HTTP client for API requests
+  • clsx & tailwind-merge – Conditional styling utilities
+  ──────
+  ### Backend
+
+  • Python 3.13 – Backend programming language
+  • FastAPI – Asynchronous REST API web framework
+  • Uvicorn – ASGI web server
+  • Starlette & Asyncio – Asynchronous concurrency and background threadpool management
+  • Pydantic & Pydantic-Settings – Data validation, serialization, and settings management
+  • Python-Multipart – Streaming multipart/form-data audio file uploads
+  ──────
+  ### Machine Learning & Audio DSP
+
+  • PyTorch & TorchAudio – Deep learning framework and audio tensor processing for AASIST
+  • TensorFlow & Keras – Deep learning framework for pretrained ResNet-34 and CNN models
+  • Classification-Models (Keras) – Pretrained ResNet-34 neural architectures
+  • SoundFile – Audio reading and float32 decoding
+  • Librosa – Audio and music signal processing
+  • SciPy – Scientific computing, signal filtering, and Discrete Cosine Transforms (DCT)
+  • FFmpeg – Multimedia audio decoding for multiple formats (WAV, MP3, FLAC, M4A, OGG)
+  • Acoustic Features: LFCC (Linear Frequency Cepstral Coefficients), MFCC (Mel-Frequency Cepstral Coefficients), and Raw 16 kHz Waveforms
+  ──────
+  ### Database & Security
+
+  • SQLAlchemy – Database ORM (Object-Relational Mapping)
+  • SQLite – Relational database for prediction audit history
+  • Python-JOSE – JSON Web Token (JWT) handling
+  • Passlib & Bcrypt – Password hashing and cryptography
+
+##### TECH path files and declarations #####
+
+  ### 1. Frontend Technology Stack
+
+   Layer / Component    │ Technology             │ Version              │ Purpose
+  ──────────────────────┼────────────────────────┼──────────────────────┼─────────────────────────────────────────────────────────────────────────────────
+   Core Framework       │ package.json           │ 19.2.8               │ Declarative component UI library
+   Language             │ tsconfig.json          │ ~6.0.2               │ Static typing, interface contracts, and compiler checks
+   Build Tool & Bundler │ vite.config.ts         │ 8.2.2                │ Next-generation ultra-fast development server & production bundler
+   Styling Engine       │ tailwind.config.js     │ 3.4.17               │ Utility-first CSS framework with custom Neumorphic (Soft UI) shadow tokens
+   CSS Preprocessing    │ PostCSS & Autoprefixer │ 8.5.28 / 10.5.5      │ CSS parsing, vendor prefixing, and stylesheet optimization
+   UI Animations        │ package.json           │ 13.2.0               │ Motion graphics, modal popups, and smooth page transitions
+   Audio Visualizer     │ AudioWaveform.tsx      │ 7.12.11              │ Interactive canvas audio waveform visualization, seeking, and playback controls
+   Iconography          │ package.json           │ 1.41.0               │ Modern SVG icons
+   HTTP Client          │ api.ts                 │ 1.20.0               │ Promise-based HTTP client for FastAPI REST endpoints
+   Class Utilities      │ clsx + tailwind-merge  │ 2.1.1 / 3.6.0        │ Conflict-free conditional CSS class merging
+  ──────
+  ### 2. Backend Technology Stack
+
+   Layer / Component       │ Technology                                   │ Purpose
+  ─────────────────────────┼──────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────
+   Web Framework           │ main.py                                      │ Modern, high-performance asynchronous REST API framework
+   ASGI Server             │ requirements.txt                             │ Asynchronous Server Gateway Interface for high-concurrency request handling
+   Concurrency & Threading │ Starlette run_in_threadpool & Python asyncio │ Offloads CPU/GPU-bound ML inference and DSP transforms without blocking the
+                           │                                              │ event loop
+   Data Validation         │ prediction.py & pydantic-settings            │ Request/response schema validation and .env configuration management
+   Security & Auth         │ Python-JOSE & Passlib (Bcrypt)               │ JWT access token management, password hashing, and endpoint security
+   Multipart Parsing       │ python-multipart                             │ Streaming batch file upload parsing
+  ──────
+  ### 3. Machine Learning & Audio DSP Stack
+
+   Layer / Component       │ Technology                                       │ Purpose
+  ─────────────────────────┼──────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────
+   PyTorch Ecosystem       │ requirements.txt & torchaudio                    │ Native 1D raw waveform preprocessing (process_raw_audio_for_aasist) and
+                           │                                                  │ AASIST graph attention modeling
+   TensorFlow Ecosystem    │ tensorflow & keras                               │ Pretrained ResNet-34 backbones (classification_models) and CNN deepfake
+                           │                                                  │ classifiers (.h5 weights)
+   Audio I/O & Decoding    │ soundfile & ffmpeg                               │ High-fidelity float32 multi-format audio decoding (WAV, MP3, FLAC, M4A,
+                           │                                                  │ OGG)
+   Signal Processing & DSP │ scipy & librosa                                  │ Pre-emphasis filters, frame-blocking (enframe), Linear/Mel Filterbanks,
+                           │                                                  │ and Discrete Cosine Transforms (DCT)
+   Feature Pipelines       │ LFCC (v1 & v2), MFCC (with head/tail             │ Acoustic feature representation extractors tuned for deepfake and vocoder
+                           │ concatenation), Raw 16kHz Waveform               │ artifact detection
+  ──────
+  ### 4. Database & Persistence Layer
+
+   Component                                │ Technology                              │ Purpose
+  ──────────────────────────────────────────┼─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────
+   ORM                                      │ session.py                              │ Python SQL toolkit and Object-Relational Mapper
+   Database Engine                          │ SQLite (asv_project.db)                 │ Local persistent storage for prediction history and audit records
+   Data Models                              │ models.py & models.py                   │ Schema tracking filename, label, confidence, and timestamp
