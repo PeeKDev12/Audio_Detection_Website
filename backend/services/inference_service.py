@@ -1,4 +1,5 @@
-﻿import os
+import asyncio
+import os
 import logging
 import tempfile
 import numpy as np
@@ -7,6 +8,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from fastapi import UploadFile, HTTPException
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from core.config import settings
 from db.models import Prediction
@@ -103,39 +105,39 @@ class InferenceService:
             raise ValueError(f"Unknown model key: {model_key}")
         return specs[model_key]
 
-    def predict_single_file(
+    def _predict_single_sync(
         self,
-        file: UploadFile,
+        file_bytes: bytes,
+        filename: str,
         model_key: str,
-        db: Session,
         class_order: Tuple[str, str] = ("Fake", "Real"),
     ) -> Dict[str, Any]:
-        """Predict a single uploaded audio file and record result in database."""
+        """CPU/GPU intensive synchronous inference pipeline executed in threadpool."""
         if not self._initialized:
             self.load_models()
 
         model = self.models.get(model_key)
         if model is None:
             logger.error(f"Model '{model_key}' is not loaded")
-            return {"filename": file.filename, "error": f"{model_key} model not loaded"}
+            return {"filename": filename, "error": f"{model_key} model not loaded"}
 
         mode, label_prefix, prefer_bins = self.get_model_specs(model_key)
 
-        # Temporary save upload
+        # Temporary save uploaded bytes for robust multi-format decoding
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-            tmp.write(file.file.read())
+            tmp.write(file_bytes)
             tmp_path = tmp.name
 
         try:
             # Step 1: Read audio
             signal, sr = read_audio(tmp_path)
             if signal is None or sr is None:
-                return {"filename": file.filename, "error": "Failed to read audio file"}
+                return {"filename": filename, "error": "Failed to read audio file"}
 
             # Step 2: Feature extraction
             feats = extract_features(signal, sr, mode=mode)
             if feats is None:
-                return {"filename": file.filename, "error": "Feature extraction failed"}
+                return {"filename": filename, "error": "Feature extraction failed"}
 
             # Step 3: Fit input shape
             x = fit_input_shape_to_model(feats, model, prefer_feature_bins=prefer_bins)
@@ -148,12 +150,57 @@ class InferenceService:
             conf_prob = float(probs[idx])
             conf_pct = conf_prob * 100.0
 
-            # Step 5: Save to database
+            # Step 5: Return prediction result dictionary
+            return {
+                "filename": filename,
+                "model": label_prefix,
+                "label": label,
+                "confidence": conf_prob,
+                "confidence_pct": round(conf_pct, 2),
+            }
+
+        except Exception as e:
+            logger.exception(f"Prediction failed for {filename} with {model_key}: {e}")
+            return {"filename": filename, "error": f"Prediction error: {str(e)}"}
+
+        finally:
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
+
+    async def predict_single_file(
+        self,
+        file: UploadFile,
+        model_key: str,
+        db: Session,
+        class_order: Tuple[str, str] = ("Fake", "Real"),
+    ) -> Dict[str, Any]:
+        """Asynchronously process an uploaded audio file without blocking main event loop."""
+        try:
+            file_bytes = await file.read()
+        except Exception as e:
+            logger.error(f"Failed reading stream for {file.filename}: {e}")
+            return {"filename": file.filename or "audio.wav", "error": "Failed to read audio upload"}
+
+        filename = file.filename or "audio.wav"
+
+        # Offload tensor/audio computations to worker threadpool
+        result = await run_in_threadpool(
+            self._predict_single_sync,
+            file_bytes,
+            filename,
+            model_key,
+            class_order,
+        )
+
+        # Log to database if prediction succeeded
+        if "error" not in result and "confidence" in result:
             try:
                 pred_record = Prediction(
-                    filename=file.filename,
-                    label=label,
-                    confidence=conf_prob,
+                    filename=result["filename"],
+                    label=result["label"],
+                    confidence=result["confidence"],
                     timestamp=datetime.utcnow(),
                 )
                 db.add(pred_record)
@@ -162,33 +209,17 @@ class InferenceService:
                 db.rollback()
                 logger.warning(f"Failed to log prediction to database: {db_err}")
 
-            # Step 6: Return structured response
-            return {
-                "filename": file.filename,
-                "model": label_prefix,
-                "label": label,
-                "confidence": conf_prob,
-                "confidence_pct": conf_pct,
-            }
+        return result
 
-        except Exception as e:
-            logger.exception(f"Prediction failed for {file.filename} with {model_key}: {e}")
-            return {"filename": file.filename, "error": "Prediction processing error"}
-
-        finally:
-            try:
-                os.unlink(tmp_path)
-            except Exception:
-                pass
-
-    def predict_batch(
+    async def predict_batch(
         self,
         files: List[UploadFile],
         model_key: str,
         db: Session
     ) -> List[Dict[str, Any]]:
-        """Predict a list of audio files."""
-        return [self.predict_single_file(f, model_key, db) for f in files]
+        """Asynchronously predict a batch of uploaded audio files concurrently."""
+        tasks = [self.predict_single_file(f, model_key, db) for f in files]
+        return await asyncio.gather(*tasks)
 
     def get_models_status(self) -> Dict[str, Dict[str, Any]]:
         """Returns the operational status and input shape of all managed models."""

@@ -1,9 +1,11 @@
-﻿import io
+import io
 import logging
 import subprocess
 import numpy as np
 import soundfile as sf
-from typing import Optional, Tuple
+import torch
+import torchaudio
+from typing import Optional, Tuple, Union
 from scipy.fftpack import dct
 from scipy.signal import lfilter
 from core.config import settings
@@ -49,6 +51,51 @@ def read_audio(path: str) -> Tuple[Optional[np.ndarray], Optional[int]]:
     except Exception as e:
         logger.error(f"Failed to read/decode audio with FFmpeg: {e}")
         return None, None
+
+
+# ================== AASIST Raw Audio Processing ==================
+def process_raw_audio_for_aasist(
+    audio_source: Union[str, bytes, io.BytesIO],
+    target_sr: int = 16000,
+    target_length: Optional[int] = None,
+) -> torch.Tensor:
+    """
+    Preprocess raw audio strictly for AASIST and raw waveform deepfake detectors.
+    - Decodes audio to mono waveform
+    - Strictly resamples to target_sr (16,000 Hz)
+    - Returns a 1D PyTorch float32 tensor (num_samples,) without extracting spectrogram/LFCC/MFCC
+    """
+    if isinstance(audio_source, (bytes, bytearray)):
+        buf = io.BytesIO(audio_source)
+        data, sr = sf.read(buf)
+    elif isinstance(audio_source, io.BytesIO):
+        audio_source.seek(0)
+        data, sr = sf.read(audio_source)
+    elif isinstance(audio_source, str):
+        data, sr = read_audio(audio_source)
+        if data is None or sr is None:
+            raise ValueError(f"Could not read audio from path: {audio_source}")
+    else:
+        raise TypeError(f"Unsupported audio source type: {type(audio_source)}")
+
+    if data.ndim > 1:
+        data = np.mean(data, axis=1)
+
+    waveform = torch.from_numpy(data.astype(np.float32)).float()
+
+    if sr != target_sr:
+        resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
+        waveform = resampler(waveform.unsqueeze(0)).squeeze(0)
+
+    if target_length is not None and target_length > 0:
+        num_samples = waveform.size(0)
+        if num_samples < target_length:
+            repeats = int(np.ceil(target_length / num_samples))
+            waveform = waveform.repeat(repeats)[:target_length]
+        elif num_samples > target_length:
+            waveform = waveform[:target_length]
+
+    return waveform
 
 
 # ================== Framing & Signal Processing ==================

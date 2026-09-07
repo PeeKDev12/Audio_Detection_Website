@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from typing import List
 from fastapi import APIRouter, File, UploadFile, Depends
 from sqlalchemy.orm import Session
@@ -19,7 +19,7 @@ async def predict_pa(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_pa called with {len(files)} file(s)")
-    return service.predict_batch(files, "PA", db)
+    return await service.predict_batch(files, "PA", db)
 
 
 @router.post("/predict_la")
@@ -29,7 +29,7 @@ async def predict_la(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_la called with {len(files)} file(s)")
-    return service.predict_batch(files, "LA", db)
+    return await service.predict_batch(files, "LA", db)
 
 
 @router.post("/predict_lfcc_mms")
@@ -39,7 +39,7 @@ async def predict_lfcc_mms(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_lfcc_mms called with {len(files)} file(s)")
-    return service.predict_batch(files, "LFCC_MMS", db)
+    return await service.predict_batch(files, "LFCC_MMS", db)
 
 
 @router.post("/predict_mfcc_mms")
@@ -49,7 +49,7 @@ async def predict_mfcc_mms(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_mfcc_mms called with {len(files)} file(s)")
-    return service.predict_batch(files, "MFCC_MMS", db)
+    return await service.predict_batch(files, "MFCC_MMS", db)
 
 
 @router.post("/predict_lfcc_vaja")
@@ -59,7 +59,7 @@ async def predict_lfcc_vaja(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_lfcc_vaja called with {len(files)} file(s)")
-    return service.predict_batch(files, "LFCC_VAJA", db)
+    return await service.predict_batch(files, "LFCC_VAJA", db)
 
 
 @router.post("/predict_mfcc_vaja")
@@ -69,7 +69,7 @@ async def predict_mfcc_vaja(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_mfcc_vaja called with {len(files)} file(s)")
-    return service.predict_batch(files, "MFCC_VAJA", db)
+    return await service.predict_batch(files, "MFCC_VAJA", db)
 
 
 @router.post("/predict_lfcc")
@@ -80,4 +80,5 @@ async def predict_lfcc(
     service: InferenceService = Depends(get_inference_svc),
 ):
     logger.info(f"/predict_lfcc(_1) called with {len(files)} file(s)")
-    return service.predict_batch(files, "LFCC", db)
+    return await service.predict_batch(files, "LFCC", db)
+

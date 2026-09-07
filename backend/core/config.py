@@ -30,7 +30,12 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'asv_project.db'}")
 
     # CORS
-    ALLOWED_ORIGINS: Union[List[str], str] = ["http://localhost:4200"]
+    ALLOWED_ORIGINS: Union[List[str], str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://localhost:4200",
+    ]
 
     # FFmpeg executable
     FFMPEG_PATH: str = os.getenv("FFMPEG_PATH", shutil.which("ffmpeg") or "ffmpeg")
