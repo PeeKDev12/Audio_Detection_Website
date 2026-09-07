@@ -33,23 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {/* NECTEC Brand Pill */}
             <div className="flex items-center justify-center px-3.5 py-1.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark group-hover:shadow-neu-inset dark:group-hover:shadow-neu-inset-dark transition-all duration-300">
-              <span className="font-extrabold text-sm sm:text-base tracking-wider bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
-                NECTEC
-              </span>
-            </div>
-
-            <div className="hidden sm:block">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-sm text-foreground tracking-tight">
-                  Audio Deepfake Lab
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-mono border border-cyan-500/20">
-                  AASIST AI
-                </span>
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                National Electronics and Computer Technology Center
-              </p>
+              <img src="/Logo_of_NECTEC.svg" alt="NECTEC Logo" className="h-10 w-auto drop-shadow-sm" />
             </div>
           </div>
 
