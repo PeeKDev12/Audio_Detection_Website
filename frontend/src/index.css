@@ -3,70 +3,48 @@
 @tailwind utilities;
 
 @layer base {
-  /* LIGHT MODE (DEFAULT) */
+  /* LIGHT MODE (PURE GALLERY WHITE & ARCHITECTURAL GRAYS) */
   :root {
-    --background: 215 28% 95%; /* #eef2f6 */
-    --foreground: 222 47% 18%;
+    --background: 0 0% 100%;       /* #ffffff */
+    --foreground: 240 10% 4%;      /* #09090b */
 
-    --card: 215 28% 95%; /* matches neumorphic background */
-    --card-foreground: 222 47% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
 
-    --neu-base: 215 28% 95%;
-    --neu-light: 0 0% 100%;
-    --neu-dark: 218 25% 86%;
+    --surface: 240 5% 96%;        /* #f4f4f5 */
+    --surface-subtle: 240 5% 98%; /* #fafafa */
 
-    --primary: 199 89% 45%;
-    --primary-foreground: 0 0% 100%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 44%; /* #6e6e77 */
 
-    --secondary: 215 20% 90%;
-    --secondary-foreground: 222 47% 20%;
+    --accent: 240 5% 92%;
+    --accent-foreground: 240 10% 4%;
 
-    --muted: 215 15% 88%;
-    --muted-foreground: 215 16% 47%;
-
-    --accent: 215 25% 92%;
-    --accent-foreground: 222 47% 15%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 20% 86%;
-    --input: 215 20% 88%;
-    --ring: 199 89% 48%;
-
-    --radius: 1rem;
+    --border: 240 6% 90%;          /* #e4e4e7 */
+    --input: 240 6% 90%;
+    --ring: 240 10% 4%;
   }
 
-  /* DARK MODE */
+  /* DARK MODE (PURE OLED BLACK & ELEVATED CHARCOAL) */
   .dark {
-    --background: 220 22% 12%; /* #181d26 */
-    --foreground: 210 30% 96%;
+    --background: 0 0% 0%;         /* #000000 */
+    --foreground: 0 0% 98%;        /* #fafafa */
 
-    --card: 220 22% 13%; /* #1a202a */
-    --card-foreground: 210 30% 96%;
+    --card: 0 0% 4%;              /* #0a0a0a */
+    --card-foreground: 0 0% 98%;
 
-    --neu-base: 220 22% 13%;
-    --neu-light: 220 18% 18%;
-    --neu-dark: 220 25% 8%;
+    --surface: 240 6% 7%;         /* #121214 */
+    --surface-subtle: 240 4% 10%; /* #18181b */
 
-    --primary: 199 89% 50%;
-    --primary-foreground: 220 25% 10%;
+    --muted: 240 4% 12%;          /* #1f1f23 */
+    --muted-foreground: 240 5% 58%; /* #8f8f97 */
 
-    --secondary: 220 18% 18%;
-    --secondary-foreground: 210 30% 96%;
+    --accent: 240 4% 15%;
+    --accent-foreground: 0 0% 98%;
 
-    --muted: 220 18% 19%;
-    --muted-foreground: 215 15% 65%;
-
-    --accent: 220 18% 21%;
-    --accent-foreground: 210 30% 98%;
-
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 18% 18%;
-    --input: 220 18% 18%;
-    --ring: 199 89% 50%;
+    --border: 240 4% 16%;         /* #27272a */
+    --input: 240 4% 16%;
+    --ring: 0 0% 98%;
   }
 }
 
@@ -78,24 +56,43 @@ body {
   margin: 0;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbars */
+/* Strict Hairline Grids & Borders */
+.hairline-border {
+  border: 1px solid hsl(var(--border));
+}
+
+.hairline-t {
+  border-top: 1px solid hsl(var(--border));
+}
+
+.hairline-b {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.hairline-r {
+  border-right: 1px solid hsl(var(--border));
+}
+
+.hairline-l {
+  border-left: 1px solid hsl(var(--border));
+}
+
+/* Custom crisp technical scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: hsl(var(--background));
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 9999px;
+  background: hsl(var(--border));
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.6);
+  background: hsl(var(--muted-foreground));
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Header } from "./components/Header"
 import { Hero } from "./components/Hero"
 import { ModelSelector, ALL_MODELS } from "./components/ModelSelector"
@@ -10,14 +11,19 @@ import { ModelsGuide } from "./components/ModelsGuide"
 import { Footer } from "./components/Footer"
 import { FirstRunModal } from "./components/FirstRunModal"
 import { apiService } from "./services/api"
-import type { PredictionResult, ModelInfo } from "./types"
+import type { PredictionResult } from "./types"
+import { type Language, translations } from "./lib/i18n"
 import { AlertCircle } from "lucide-react"
 
 export function App() {
-  // Light mode is default (false)
+  // Light mode is default (false), Dark mode is OLED black (true)
   const [darkMode, setDarkMode] = useState(false)
   
-  // Model selection: Default is ONLY LFCC_VAJA
+  // Bilingual state: "en" | "th"
+  const [language, setLanguage] = useState<Language>("en")
+  const t = translations[language]
+
+  // Model selection: Default is ONLY LFCC_VAJA (LFCC-VAJA+Genuine)
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>(["LFCC_VAJA"])
   
   // Audio files queue & waveform selection
@@ -38,7 +44,7 @@ export function App() {
   // Backend Health Ping
   const [backendOnline, setBackendOnline] = useState(false)
 
-  // Apply dark mode class to HTML document
+  // Apply dark mode class to HTML element
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark")
@@ -95,7 +101,6 @@ export function App() {
     setIsModelSelectorHighlighted(false)
     setSelectedModelIds((prev) => {
       if (prev.includes(modelId)) {
-        // Keep at least one model selected
         if (prev.length === 1) return prev
         return prev.filter((id) => id !== modelId)
       } else {
@@ -117,7 +122,6 @@ export function App() {
   const handleRunClick = () => {
     if (files.length === 0) return
 
-    // If first run hasn't been acknowledged yet
     if (!hasConfirmedFirstRun) {
       setIsFirstRunModalOpen(true)
       setIsModelSelectorHighlighted(true)
@@ -128,7 +132,6 @@ export function App() {
       return
     }
 
-    // Otherwise proceed to execute inference directly
     executeInference()
   }
 
@@ -159,18 +162,16 @@ export function App() {
       const selectedModels = ALL_MODELS.filter((m) => selectedModelIds.includes(m.id))
       const combinedResults: PredictionResult[] = []
 
-      // Run inference for each selected model
       for (const model of selectedModels) {
         const batchRes = await apiService.predictBatch(model.endpoint, files)
         combinedResults.push(...batchRes)
       }
 
-      // Snap faux progress to 100%
       setIsAnalysisComplete(true)
       setTimeout(() => {
         setResults(combinedResults)
         setIsAnalyzing(false)
-      }, 500)
+      }, 400)
     } catch (err: any) {
       console.error("Inference execution failed:", err)
       setIsAnalyzing(false)
@@ -188,117 +189,135 @@ export function App() {
     .join(", ")
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-cyan-500/30 selection:text-cyan-600 dark:selection:text-cyan-300">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-foreground selection:text-background">
       {/* First Run Interception Modal */}
       <FirstRunModal
         isOpen={isFirstRunModalOpen}
         onConfirmAndRun={handleConfirmAndRun}
         onExploreModels={handleExploreModels}
+        language={language}
       />
 
-      {/* Sticky Neumorphic Header */}
+      {/* Sticky Razor-thin Minimal Header */}
       <Header
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        language={language}
+        setLanguage={setLanguage}
         backendOnline={backendOnline}
       />
 
-      {/* Main Content Sections */}
+      {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Offline Banner */}
+        {/* Offline Warning Strip */}
         {!backendOnline && (
-          <div className="mt-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 flex items-center justify-between text-xs sm:text-sm">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
+          <div className="mt-4 p-3 border border-border bg-surface font-mono text-xs flex items-center justify-between text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-rose-500" />
               <span>
-                Backend server is currently offline at <code className="font-mono font-bold">http://127.0.0.1:8000</code>. Please start the backend with <code className="font-mono bg-amber-500/20 px-1.5 py-0.5 rounded">python main.py</code>.
+                [BACKEND_OFFLINE] FastAPI server not detected at http://127.0.0.1:8000. Start backend using `python main.py`.
               </span>
             </div>
           </div>
         )}
 
-        {/* Global Error Banner */}
+        {/* Global Error Strip */}
         {errorMessage && (
-          <div className="mt-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 flex items-center justify-between text-xs sm:text-sm">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
+          <div className="mt-4 p-3 border border-rose-500 bg-rose-500/10 font-mono text-xs flex items-center justify-between text-rose-600 dark:text-rose-400">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
             <button
               onClick={() => setErrorMessage(null)}
-              className="text-xs text-rose-600 dark:text-rose-300 underline font-bold"
+              className="text-xs uppercase font-bold hover:underline"
             >
-              Dismiss
+              [DISMISS]
             </button>
           </div>
         )}
 
         {/* 1. Hero Section */}
-        <Hero />
+        <Hero language={language} />
 
-        {/* 2. Detection Section */}
-        <section id="detection" className="space-y-8 scroll-mt-24">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-              Audio Deepfake Analysis & Waveform Inspection
+        {/* 2. Asymmetrical Scrollytelling Detection Section */}
+        <section id="detection" className="py-12 space-y-10 scroll-mt-20">
+          <div className="space-y-1">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground block">
+              [INFERENCE_SECTION]
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground uppercase">
+              {t.sectionDetectionTitle}
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Upload single or batch audio files to evaluate spectro-temporal bonafide vs. spoof probabilities
+            <p className="text-xs text-muted-foreground font-sans max-w-2xl">
+              {t.sectionDetectionSubtitle}
             </p>
           </div>
 
-          {/* Audio Upload Dropzone & Queue */}
-          <FileDropzone
-            files={files}
-            onFilesAdded={handleFilesAdded}
-            onFileRemoved={handleFileRemoved}
-            onClearAll={handleClearAll}
-            selectedPreviewFile={selectedPreviewFile}
-            onSelectPreviewFile={setSelectedPreviewFile}
-            isAnalyzing={isAnalyzing}
-            onRunClick={handleRunClick}
-          />
+          {/* 50/50 Asymmetrical Scrollytelling Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Sticky Audio Ingestion & Waveform */}
+            <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+              <FileDropzone
+                files={files}
+                onFilesAdded={handleFilesAdded}
+                onFileRemoved={handleFileRemoved}
+                onClearAll={handleClearAll}
+                selectedPreviewFile={selectedPreviewFile}
+                onSelectPreviewFile={setSelectedPreviewFile}
+                isAnalyzing={isAnalyzing}
+                onRunClick={handleRunClick}
+                language={language}
+              />
+            </div>
 
-          {/* Model Selection Widget */}
-          <ModelSelector
-            selectedModelIds={selectedModelIds}
-            onToggleModel={handleToggleModel}
-            onSelectAll={handleSelectAllModels}
-            isHighlighted={isModelSelectorHighlighted}
-          />
+            {/* Right Column: Model Registry & Results Stream */}
+            <div className="lg:col-span-7 space-y-6">
+              {/* Model Selection Registry Table */}
+              <ModelSelector
+                selectedModelIds={selectedModelIds}
+                onToggleModel={handleToggleModel}
+                onSelectAll={handleSelectAllModels}
+                isHighlighted={isModelSelectorHighlighted}
+                language={language}
+              />
 
-          {/* Faux Progress Bar with Stalling Simulation */}
-          <FauxProgressBar
-            isAnalyzing={isAnalyzing}
-            isComplete={isAnalysisComplete}
-            modelNames={selectedModelNames}
-          />
+              {/* Faux Geometric Progress Bar */}
+              <FauxProgressBar
+                isAnalyzing={isAnalyzing}
+                isComplete={isAnalysisComplete}
+                modelNames={selectedModelNames}
+                language={language}
+              />
 
-          {/* Prediction Results Display */}
-          {results.length > 0 && (
-            <ResultsDisplay
-              results={results}
-              onSelectAudioForPlayback={(fname) => {
-                const match = files.find((f) => f.name === fname)
-                if (match) setSelectedPreviewFile(match)
-              }}
-            />
-          )}
+              {/* Results Ledger Stream */}
+              {results.length > 0 && (
+                <ResultsDisplay
+                  results={results}
+                  onSelectAudioForPlayback={(fname) => {
+                    const match = files.find((f) => f.name === fname)
+                    if (match) setSelectedPreviewFile(match)
+                  }}
+                  language={language}
+                />
+              )}
+            </div>
+          </div>
         </section>
 
-        {/* 3. History Section */}
-        <div className="scroll-mt-24">
-          <HistoryView />
+        {/* 3. Historical Audit Ledger */}
+        <div className="scroll-mt-20">
+          <HistoryView language={language} />
         </div>
 
-        {/* 4. Models Guide Section */}
-        <div className="scroll-mt-24">
-          <ModelsGuide />
+        {/* 4. Technical Architectures Guide */}
+        <div className="scroll-mt-20">
+          <ModelsGuide language={language} />
         </div>
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer language={language} />
     </div>
   )
 }

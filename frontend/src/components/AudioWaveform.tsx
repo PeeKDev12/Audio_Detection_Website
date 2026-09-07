@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import WaveSurfer from "wavesurfer.js"
-import { Play, Pause, RotateCcw, Volume2, VolumeX, FastForward } from "lucide-react"
+import { Play, Pause, RotateCcw, Volume2, VolumeX } from "lucide-react"
 
 interface AudioWaveformProps {
   file?: File
@@ -12,7 +12,7 @@ interface AudioWaveformProps {
 export const AudioWaveform: React.FC<AudioWaveformProps> = ({
   file,
   audioUrl,
-  height = 70,
+  height = 64,
   onReady,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -31,16 +31,17 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
       wavesurferRef.current.destroy()
     }
 
+    const isDark = document.documentElement.classList.contains("dark")
+
     const ws = WaveSurfer.create({
       container: containerRef.current,
-      waveColor: "#0891b2",
-      progressColor: "#06b6d4",
-      cursorColor: "#2563eb",
-      cursorWidth: 2,
+      waveColor: isDark ? "#3f3f46" : "#d4d4d8",
+      progressColor: isDark ? "#ffffff" : "#09090b",
+      cursorColor: isDark ? "#ffffff" : "#09090b",
+      cursorWidth: 1,
       height: height,
-      barWidth: 2,
+      barWidth: 1,
       barGap: 2,
-      barRadius: 2,
       normalize: true,
     })
 
@@ -117,66 +118,76 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
   }
 
   return (
-    <div className="bg-background rounded-2xl p-4 shadow-neu-inset dark:shadow-neu-inset-dark space-y-3">
+    <div className="border border-border p-4 bg-surface/30 space-y-3 font-mono">
       {/* Waveform Canvas */}
       <div className="relative">
-        <div ref={containerRef} className="w-full rounded-xl overflow-hidden" />
+        <div ref={containerRef} className="w-full" />
         {!isLoaded && (
-          <div className="h-16 flex items-center justify-center text-xs text-muted-foreground animate-pulse font-mono">
-            Decoding audio waveform...
+          <div className="h-16 flex items-center justify-center text-[11px] text-muted-foreground tracking-widest uppercase">
+            [DECODING_PCM_STREAM...]
           </div>
         )}
       </div>
 
-      {/* Controls Bar with Neumorphic buttons */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/50 text-xs sm:text-sm">
-        <div className="flex items-center gap-2">
+      {/* Strict Minimal Mechanical Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border text-xs">
+        <div className="flex items-center gap-1.5">
           {/* Play/Pause */}
           <button
+            type="button"
             onClick={togglePlay}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-cyan-600 dark:text-cyan-400 font-bold disabled:opacity-40 transition-all"
-            title={isPlaying ? "Pause" : "Play"}
+            className="px-3 py-1.5 bg-foreground text-background font-bold text-[11px] uppercase tracking-wider hover:opacity-80 disabled:opacity-30 transition-opacity flex items-center gap-1.5"
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+            {isPlaying ? (
+              <>
+                <Pause className="w-3.5 h-3.5" />
+                <span>PAUSE</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>PLAY</span>
+              </>
+            )}
           </button>
 
           {/* Restart */}
           <button
+            type="button"
             onClick={handleRestart}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground/80 hover:text-foreground disabled:opacity-40 transition-all"
-            title="Restart Audio"
+            className="p-1.5 border border-border hover:bg-surface text-foreground disabled:opacity-30 transition-colors"
+            title="Restart Track"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-3.5 h-3.5" />
           </button>
 
           {/* Mute */}
           <button
+            type="button"
             onClick={toggleMute}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground/80 hover:text-foreground disabled:opacity-40 transition-all"
-            title={isMuted ? "Unmute" : "Mute"}
+            className="p-1.5 border border-border hover:bg-surface text-foreground disabled:opacity-30 transition-colors"
+            title="Toggle Mute"
           >
-            {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
 
           {/* Speed */}
           <button
+            type="button"
             onClick={cyclePlaybackRate}
             disabled={!isLoaded}
-            className="px-3 py-2 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-cyan-600 dark:text-cyan-400 font-mono text-xs disabled:opacity-40 transition-all flex items-center gap-1"
-            title="Playback Speed"
+            className="px-2.5 py-1.5 border border-border hover:bg-surface text-foreground font-mono text-[10px] disabled:opacity-30 transition-colors"
           >
-            <FastForward className="w-3 h-3" />
-            <span>{playbackRate}x</span>
+            {playbackRate}X
           </button>
         </div>
 
-        {/* Time Stamp */}
-        <div className="font-mono text-xs px-3 py-1.5 rounded-xl bg-background shadow-neu-sm dark:shadow-neu-sm-dark">
-          <span className="text-cyan-600 dark:text-cyan-400 font-bold">{formatTime(currentTime)}</span>
-          <span className="text-muted-foreground"> / {formatTime(duration)}</span>
+        {/* Timestamp */}
+        <div className="text-[11px] text-muted-foreground">
+          <span className="text-foreground font-bold">{formatTime(currentTime)}</span> / {formatTime(duration)}
         </div>
       </div>
     </div>

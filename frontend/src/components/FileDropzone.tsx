@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react"
-import { UploadCloud, FileAudio, Trash2, PlayCircle, Waves, CheckCircle2, Sparkles } from "lucide-react"
+import { UploadCloud, FileAudio, Trash2, PlayCircle, ArrowRight } from "lucide-react"
 import { AudioWaveform } from "./AudioWaveform"
+import { type Language, translations } from "../lib/i18n"
 
 interface FileDropzoneProps {
   files: File[]
@@ -11,6 +12,7 @@ interface FileDropzoneProps {
   onSelectPreviewFile: (file: File) => void
   isAnalyzing: boolean
   onRunClick: () => void
+  language: Language
 }
 
 export const FileDropzone: React.FC<FileDropzoneProps> = ({
@@ -22,9 +24,11 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
   onSelectPreviewFile,
   isAnalyzing,
   onRunClick,
+  language,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const t = translations[language]
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -70,16 +74,16 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Drop Area */}
+      {/* Strict Minimal Dropzone Box */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`group relative rounded-3xl p-8 sm:p-10 text-center cursor-pointer transition-all duration-300 ${
+        className={`border border-dashed p-8 sm:p-10 text-center cursor-pointer transition-colors ${
           isDragOver
-            ? "shadow-neu-inset dark:shadow-neu-inset-dark ring-2 ring-cyan-500 scale-[0.99]"
-            : "bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-sm dark:hover:shadow-neu-sm-dark"
+            ? "border-foreground bg-surface"
+            : "border-border hover:border-foreground hover:bg-surface/40 bg-background"
         }`}
       >
         <input
@@ -91,126 +95,118 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
           onChange={handleFileInputChange}
         />
 
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="p-5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark group-hover:shadow-neu-inset dark:group-hover:shadow-neu-inset-dark text-cyan-600 dark:text-cyan-400 transition-all duration-300">
-            <UploadCloud className="w-10 h-10" />
-          </div>
+        <div className="flex flex-col items-center justify-center space-y-3 font-mono">
+          <UploadCloud className="w-8 h-8 text-foreground" />
           <div>
-            <p className="text-base sm:text-lg font-bold text-foreground">
-              Drop audio files here, or <span className="text-cyan-600 dark:text-cyan-400 underline underline-offset-4">browse</span>
+            <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-foreground">
+              {t.dropzoneTitle}
             </p>
-            <p className="text-xs text-muted-foreground mt-1.5 font-mono">
-              Supports .WAV, .MP3, .FLAC (16kHz recommended for AASIST)
+            <p className="text-[11px] text-muted-foreground mt-1 underline underline-offset-4">
+              {t.dropzoneBrowse}
+            </p>
+            <p className="text-[10px] text-muted-foreground mt-2">
+              {t.dropzoneFormats}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Selected Audio Files & Waveform Monitor */}
-      {files.length > 0 && (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          {/* Waveform Inspection Card */}
-          <div className="bg-background rounded-3xl p-6 shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-border/50">
-              <div className="flex items-center gap-2">
-                <Waves className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <h4 className="text-sm font-bold text-foreground">
-                  Interactive Waveform Visualizer
-                </h4>
-              </div>
-              {selectedPreviewFile && (
-                <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 truncate max-w-[220px]">
-                  {selectedPreviewFile.name}
-                </span>
-              )}
-            </div>
+      {/* Waveform Inspection Monitor */}
+      <div className="border border-border space-y-3">
+        <div className="p-3 bg-surface border-b border-border flex items-center justify-between font-mono text-xs">
+          <span className="font-bold tracking-wider uppercase text-foreground">
+            {t.waveformTitle}
+          </span>
+          {selectedPreviewFile && (
+            <span className="text-[10px] text-muted-foreground truncate max-w-[200px]">
+              [{selectedPreviewFile.name}]
+            </span>
+          )}
+        </div>
 
-            {selectedPreviewFile ? (
-              <AudioWaveform file={selectedPreviewFile} height={75} />
-            ) : (
-              <div className="p-6 text-center text-xs text-muted-foreground">
-                Select a file from below to monitor waveform
-              </div>
-            )}
+        <div className="p-4">
+          {selectedPreviewFile ? (
+            <AudioWaveform file={selectedPreviewFile} height={70} />
+          ) : (
+            <div className="py-10 text-center font-mono text-xs text-muted-foreground uppercase tracking-wider border border-dashed border-border/70">
+              {t.noFileSelected}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Ingestion Queue Table */}
+      {files.length > 0 && (
+        <div className="border border-border space-y-3 animate-in fade-in duration-200">
+          <div className="p-3 bg-surface border-b border-border flex items-center justify-between font-mono text-xs">
+            <span className="font-bold tracking-wider text-foreground uppercase">
+              {t.queueTitle} [{files.length}]
+            </span>
+            <button
+              onClick={onClearAll}
+              disabled={isAnalyzing}
+              className="text-[11px] text-muted-foreground hover:text-foreground hover:underline transition-colors"
+            >
+              [{t.clearQueue}]
+            </button>
           </div>
 
-          {/* Files List Card */}
-          <div className="bg-background rounded-3xl p-6 shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <FileAudio className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                <span className="text-sm font-bold text-foreground">
-                  Selected Audio Queue ({files.length})
-                </span>
-              </div>
-              <button
-                onClick={onClearAll}
-                disabled={isAnalyzing}
-                className="text-xs font-medium text-muted-foreground hover:text-rose-500 transition-colors"
-              >
-                Clear Queue
-              </button>
-            </div>
-
-            <div className="max-h-56 overflow-y-auto space-y-2 pr-1">
-              {files.map((file, idx) => {
-                const isSelected = selectedPreviewFile === file
-                return (
+          <div className="max-h-52 overflow-y-auto divide-y divide-border">
+            {files.map((file, idx) => {
+              const isSelected = selectedPreviewFile === file
+              return (
+                <div
+                  key={`${file.name}-${idx}`}
+                  className={`flex items-center justify-between p-3 font-mono text-xs transition-colors ${
+                    isSelected
+                      ? "bg-surface font-bold text-foreground"
+                      : "text-muted-foreground hover:bg-surface/50 hover:text-foreground"
+                  }`}
+                >
                   <div
-                    key={`${file.name}-${idx}`}
-                    className={`flex items-center justify-between p-3 rounded-2xl transition-all select-none ${
-                      isSelected
-                        ? "shadow-neu-inset dark:shadow-neu-inset-dark bg-secondary/30 ring-1 ring-cyan-500/40"
-                        : "shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark bg-background"
-                    }`}
+                    className="flex items-center gap-3 overflow-hidden cursor-pointer flex-1"
+                    onClick={() => onSelectPreviewFile(file)}
                   >
-                    <div
-                      className="flex items-center gap-3 overflow-hidden cursor-pointer flex-1"
-                      onClick={() => onSelectPreviewFile(file)}
-                    >
-                      <PlayCircle
-                        className={`w-4 h-4 shrink-0 ${
-                          isSelected ? "text-cyan-500" : "text-muted-foreground"
-                        }`}
-                      />
-                      <div className="truncate">
-                        <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
-                        <span className="text-[10px] text-muted-foreground font-mono">
-                          {formatFileSize(file.size)}
-                        </span>
-                      </div>
+                    <PlayCircle
+                      className={`w-3.5 h-3.5 shrink-0 ${
+                        isSelected ? "text-foreground" : "text-muted-foreground"
+                      }`}
+                    />
+                    <div className="truncate">
+                      <span className="truncate">{file.name}</span>
+                      <span className="text-[10px] text-muted-foreground ml-2">
+                        [{formatFileSize(file.size)}]
+                      </span>
                     </div>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onFileRemoved(idx)
-                      }}
-                      disabled={isAnalyzing}
-                      className="p-2 rounded-xl text-muted-foreground hover:text-rose-500 hover:shadow-neu-sm dark:hover:shadow-neu-sm-dark transition-all ml-2"
-                      title="Remove file"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
-                )
-              })}
-            </div>
 
-            {/* Run Analysis Action Button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={onRunClick}
-                disabled={isAnalyzing || files.length === 0}
-                className="w-full py-4 px-6 rounded-2xl bg-background text-foreground font-extrabold text-sm sm:text-base shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2 border border-border/40"
-              >
-                <Sparkles className="w-4 h-4 text-cyan-500" />
-                <span className="bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400 bg-clip-text text-transparent">
-                  {isAnalyzing ? "Processing Asynchronous Inference..." : `Run Analysis on ${files.length} File${files.length > 1 ? "s" : ""}`}
-                </span>
-              </button>
-            </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onFileRemoved(idx)
+                    }}
+                    disabled={isAnalyzing}
+                    className="p-1 text-muted-foreground hover:text-foreground ml-2"
+                    title="Remove file"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Stark Action Button */}
+          <div className="p-3 bg-surface border-t border-border">
+            <button
+              type="button"
+              onClick={onRunClick}
+              disabled={isAnalyzing || files.length === 0}
+              className="w-full py-3.5 px-4 bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-3"
+            >
+              <span>{isAnalyzing ? t.runningButton : `${t.runButton} [${files.length}]`}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

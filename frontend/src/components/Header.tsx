@@ -1,18 +1,25 @@
 import React, { useState } from "react"
-import { Sun, Moon, Menu, X, ShieldAlert, Cpu, History, Radio, Home } from "lucide-react"
+import { motion } from "framer-motion"
+import { Sun, Moon, Menu, X } from "lucide-react"
+import { type Language, translations } from "../lib/i18n"
 
 interface HeaderProps {
   darkMode: boolean
   setDarkMode: (val: boolean) => void
+  language: Language
+  setLanguage: (lang: Language) => void
   backendOnline: boolean
 }
 
 export const Header: React.FC<HeaderProps> = ({
   darkMode,
   setDarkMode,
+  language,
+  setLanguage,
   backendOnline,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const t = translations[language]
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false)
@@ -23,122 +30,138 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border/60 shadow-neu-sm dark:shadow-neu-sm-dark transition-all duration-300">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-none hairline-b transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Left: NECTEC Logo Placeholder & Branding */}
+        <div className="flex items-center justify-between h-16">
+          {/* Left: NECTEC Architectural Monogram */}
           <div
-            className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => scrollToSection("home")}
+            className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            {/* NECTEC Brand Pill */}
-            <div className="flex items-center justify-center px-3.5 py-1.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark group-hover:shadow-neu-inset dark:group-hover:shadow-neu-inset-dark transition-all duration-300">
-              <img src="/Logo_of_NECTEC.svg" alt="NECTEC Logo" className="h-10 w-auto drop-shadow-sm" />
+            <div className="px-2.5 py-1 bg-foreground text-background font-mono font-bold text-xs uppercase tracking-widest transition-transform group-hover:scale-95">
+              NECTEC
+            </div>
+            <div className="hidden sm:block">
+              <span className="font-mono text-xs font-bold tracking-tight text-foreground uppercase">
+                AASIST // MONOGRAPH
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground ml-2">
+                REV.2026
+              </span>
             </div>
           </div>
 
-          {/* Center/Right: Desktop Navigation & Smooth Scroll */}
-          <nav className="hidden md:flex items-center gap-2">
+          {/* Center/Desktop Navigation (Monospaced Index style) */}
+          <nav className="hidden lg:flex items-center space-x-6 text-xs font-mono tracking-wider">
             <button
               onClick={() => scrollToSection("home")}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-foreground/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground hover:underline underline-offset-8 transition-colors"
             >
-              <Home className="w-3.5 h-3.5" />
-              <span>Home</span>
+              {t.navHome}
             </button>
-
             <button
               onClick={() => scrollToSection("detection")}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-foreground/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground hover:underline underline-offset-8 transition-colors"
             >
-              <Radio className="w-3.5 h-3.5" />
-              <span>Detection</span>
+              {t.navDetection}
             </button>
-
             <button
               onClick={() => scrollToSection("history")}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-foreground/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground hover:underline underline-offset-8 transition-colors"
             >
-              <History className="w-3.5 h-3.5" />
-              <span>History</span>
+              {t.navHistory}
             </button>
-
             <button
               onClick={() => scrollToSection("models-guide")}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-foreground/80 hover:text-cyan-600 dark:hover:text-cyan-400 hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all flex items-center gap-1.5"
+              className="text-muted-foreground hover:text-foreground hover:underline underline-offset-8 transition-colors"
             >
-              <Cpu className="w-3.5 h-3.5" />
-              <span>Architectures</span>
+              {t.navModels}
             </button>
           </nav>
 
-          {/* Right: Theme Switcher & Status & Mobile Toggle */}
+          {/* Right: Bilingual Mechanical Switch & Theme Switch */}
           <div className="flex items-center gap-3">
-            {/* Live Backend Badge */}
-            <div
-              className={`hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-mono shadow-neu-inset dark:shadow-neu-inset-dark ${
-                backendOnline
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-amber-600 dark:text-amber-400"
-              }`}
-            >
+            {/* Backend API Status Indicator */}
+            <div className="hidden md:flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted-foreground border border-border px-2 py-1">
               <span
-                className={`w-2 h-2 rounded-full ${
-                  backendOnline ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                className={`w-1.5 h-1.5 ${
+                  backendOnline ? "bg-emerald-500" : "bg-rose-500"
                 }`}
               />
-              <span>{backendOnline ? "API Live" : "Offline"}</span>
+              <span>{backendOnline ? t.statusOnline : t.statusOffline}</span>
             </div>
 
-            {/* Light / Dark Mode Toggle (Neumorphic Switch) */}
+            {/* Bilingual Mechanical Physical Toggle */}
+            <div className="flex items-center border border-border p-0.5 bg-surface font-mono text-xs select-none">
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`px-2 py-1 text-[11px] font-bold tracking-wider transition-all ${
+                  language === "en"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("th")}
+                className={`px-2 py-1 text-[11px] font-bold tracking-wider transition-all ${
+                  language === "th"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                TH
+              </button>
+            </div>
+
+            {/* Dark/Light Minimal Switch */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground hover:text-cyan-500 transition-all duration-200"
+              className="p-1.5 border border-border hover:bg-surface text-foreground transition-colors"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground"
+              className="lg:hidden p-1.5 border border-border hover:bg-surface text-foreground"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/40 space-y-2 animate-in slide-in-from-top-2 duration-200">
+          <div className="lg:hidden py-4 hairline-t space-y-3 font-mono text-xs">
             <button
               onClick={() => scrollToSection("home")}
-              className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-secondary/40 flex items-center gap-2"
+              className="block w-full text-left py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-surface"
             >
-              <Home className="w-4 h-4 text-cyan-500" />
-              <span>Home</span>
+              {t.navHome}
             </button>
             <button
               onClick={() => scrollToSection("detection")}
-              className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-secondary/40 flex items-center gap-2"
+              className="block w-full text-left py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-surface"
             >
-              <Radio className="w-4 h-4 text-cyan-500" />
-              <span>Audio Detection</span>
+              {t.navDetection}
             </button>
             <button
               onClick={() => scrollToSection("history")}
-              className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-secondary/40 flex items-center gap-2"
+              className="block w-full text-left py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-surface"
             >
-              <History className="w-4 h-4 text-cyan-500" />
-              <span>Detection History</span>
+              {t.navHistory}
             </button>
             <button
               onClick={() => scrollToSection("models-guide")}
-              className="w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-secondary/40 flex items-center gap-2"
+              className="block w-full text-left py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-surface"
             >
-              <Cpu className="w-4 h-4 text-cyan-500" />
-              <span>Model Architectures</span>
+              {t.navModels}
             </button>
           </div>
         )}

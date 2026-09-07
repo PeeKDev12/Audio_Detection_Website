@@ -1,6 +1,7 @@
 import React from "react"
-import { Cpu, CheckCircle2, CheckSquare, Square, Layers, Waves, Sparkles } from "lucide-react"
+import { CheckSquare, Square } from "lucide-react"
 import type { ModelInfo } from "../types"
+import { type Language, translations } from "../lib/i18n"
 
 export const ALL_MODELS: ModelInfo[] = [
   {
@@ -8,15 +9,15 @@ export const ALL_MODELS: ModelInfo[] = [
     name: "LFCC-VAJA+Genuine",
     endpoint: "/predict_lfcc_vaja",
     featureExtractor: "LFCC",
-    architecture: "CNN Deep Classifier",
-    description: "Trained on high-fidelity Vaja speech synthesis corpus with genuine baseline acoustic distribution.",
+    architecture: "Deep CNN Classifier",
+    description: "Benchmark trained on high-fidelity Vaja voice synthesis datasets with genuine acoustic baselines.",
     inputShape: "(57, T, 1)",
-    badge: "Default Benchmark",
-    color: "cyan",
+    badge: "DEFAULT BENCHMARK",
+    color: "zinc",
     metrics: {
       eer: "0.94%",
-      f1: "99.1%",
-      accuracy: "99.3%",
+      f1: "99.10%",
+      accuracy: "99.32%",
     },
   },
   {
@@ -24,14 +25,14 @@ export const ALL_MODELS: ModelInfo[] = [
     name: "MFCC-VAJA+Genuine",
     endpoint: "/predict_mfcc_vaja",
     featureExtractor: "MFCC",
-    architecture: "CNN Classifier",
-    description: "MFCC perceptual filterbanks with 20% head/tail concatenation targeting Vaja voice synthesis artifacts.",
+    architecture: "Deep CNN Classifier",
+    description: "Perceptual Mel-scale filterbanks with 20% head/tail margin concatenation for Vaja synthesis.",
     inputShape: "(60, T, 1)",
-    color: "purple",
+    color: "zinc",
     metrics: {
       eer: "1.25%",
-      f1: "98.6%",
-      accuracy: "98.8%",
+      f1: "98.60%",
+      accuracy: "98.81%",
     },
   },
   {
@@ -39,15 +40,15 @@ export const ALL_MODELS: ModelInfo[] = [
     name: "ResNet34 (PA)",
     endpoint: "/predict_pa",
     featureExtractor: "LFCC",
-    architecture: "Deep Residual Network (ResNet-34)",
-    description: "Specialized for ASVspoof Physical Access acoustic replay and speaker simulator detection.",
+    architecture: "ResNet-34 Residual Net",
+    description: "ASVspoof Physical Access acoustic replay and physical room acoustic variation detector.",
     inputShape: "(57, 600, 1)",
-    badge: "Recommended PA",
-    color: "blue",
+    badge: "RECOMMENDED PA",
+    color: "zinc",
     metrics: {
       eer: "0.88%",
-      f1: "99.2%",
-      accuracy: "99.4%",
+      f1: "99.20%",
+      accuracy: "99.41%",
     },
   },
   {
@@ -55,15 +56,15 @@ export const ALL_MODELS: ModelInfo[] = [
     name: "ResNet34 (LA)",
     endpoint: "/predict_la",
     featureExtractor: "LFCC",
-    architecture: "Deep Residual Network (ResNet-34)",
-    description: "ASVspoof Logical Access anti-spoofing against modern neural TTS & voice cloning algorithms.",
+    architecture: "ResNet-34 Residual Net",
+    description: "ASVspoof Logical Access countermeasure against text-to-speech & voice conversion algorithms.",
     inputShape: "(57, 746, 1)",
-    badge: "Recommended LA",
-    color: "indigo",
+    badge: "RECOMMENDED LA",
+    color: "zinc",
     metrics: {
       eer: "0.81%",
-      f1: "99.4%",
-      accuracy: "99.5%",
+      f1: "99.40%",
+      accuracy: "99.55%",
     },
   },
   {
@@ -72,13 +73,13 @@ export const ALL_MODELS: ModelInfo[] = [
     endpoint: "/predict_lfcc_mms",
     featureExtractor: "LFCC",
     architecture: "CNN Classifier",
-    description: "Linear Frequency Cepstral Coefficients model trained on multi-modal speech corpus.",
+    description: "Linear Frequency Cepstral Coefficients model trained across multi-modal speech corpora.",
     inputShape: "(57, T, 1)",
-    color: "teal",
+    color: "zinc",
     metrics: {
       eer: "1.02%",
-      f1: "98.9%",
-      accuracy: "99.1%",
+      f1: "98.90%",
+      accuracy: "99.12%",
     },
   },
   {
@@ -87,13 +88,13 @@ export const ALL_MODELS: ModelInfo[] = [
     endpoint: "/predict_mfcc_mms",
     featureExtractor: "MFCC",
     architecture: "CNN Classifier",
-    description: "Mel-Frequency Cepstral Coefficients evaluated on multi-speaker diverse acoustic environments.",
+    description: "Mel-Frequency Cepstral Coefficients model evaluated on multi-speaker diverse environments.",
     inputShape: "(60, T, 1)",
-    color: "amber",
+    color: "zinc",
     metrics: {
       eer: "1.40%",
-      f1: "98.2%",
-      accuracy: "98.4%",
+      f1: "98.20%",
+      accuracy: "98.40%",
     },
   },
   {
@@ -102,13 +103,13 @@ export const ALL_MODELS: ModelInfo[] = [
     endpoint: "/predict_lfcc",
     featureExtractor: "LFCC",
     architecture: "CNN Baseline",
-    description: "Standard benchmark evaluated across 3,000 diverse test samples and compression codecs.",
+    description: "Standard benchmark evaluated across 3,000 diverse evaluation audio recordings.",
     inputShape: "(57, T, 1)",
-    color: "emerald",
+    color: "zinc",
     metrics: {
       eer: "1.15%",
-      f1: "98.7%",
-      accuracy: "98.9%",
+      f1: "98.70%",
+      accuracy: "98.90%",
     },
   },
 ]
@@ -118,6 +119,7 @@ interface ModelSelectorProps {
   onToggleModel: (modelId: string) => void
   onSelectAll: (selectAll: boolean) => void
   isHighlighted?: boolean
+  language: Language
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
@@ -125,113 +127,121 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   onToggleModel,
   onSelectAll,
   isHighlighted = false,
+  language,
 }) => {
+  const t = translations[language]
   const isAllSelected = selectedModelIds.length === ALL_MODELS.length
 
   return (
     <div
       id="model-selector-widget"
-      className={`space-y-4 rounded-3xl p-6 bg-background transition-all duration-500 ${
+      className={`border transition-all duration-300 ${
         isHighlighted
-          ? "shadow-neu-glow-cyan ring-2 ring-cyan-500 animate-pulse"
-          : "shadow-neu-flat dark:shadow-neu-flat-dark"
+          ? "border-foreground ring-2 ring-foreground"
+          : "border-border"
       }`}
     >
-      {/* Widget Header & Select All Checkbox */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/60">
+      {/* Logbook Header Bar */}
+      <div className="p-4 bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border">
         <div>
-          <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-            <Cpu className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-            <span>Machine Learning Detection Models</span>
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Select one or multiple neural architectures for simultaneous comparative inference
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-foreground">
+              {t.modelSectionTitle}
+            </span>
+            <span className="text-[10px] font-mono text-muted-foreground">
+              [{selectedModelIds.length}/{ALL_MODELS.length} ACTIVE]
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5 font-sans">
+            {t.modelSectionSubtitle}
           </p>
         </div>
 
-        {/* Select All Models Toggle */}
+        {/* Select All Checkbox */}
         <button
           type="button"
           onClick={() => onSelectAll(!isAllSelected)}
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-background shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark text-xs font-semibold text-foreground transition-all duration-200 self-start sm:self-auto"
+          className="inline-flex items-center gap-2 px-3 py-1.5 border border-border bg-background hover:bg-surface font-mono text-xs text-foreground transition-colors self-start sm:self-auto"
         >
           {isAllSelected ? (
-            <CheckSquare className="w-4 h-4 text-cyan-500" />
+            <CheckSquare className="w-4 h-4 text-foreground" />
           ) : (
             <Square className="w-4 h-4 text-muted-foreground" />
           )}
-          <span>Select All Models ({ALL_MODELS.length})</span>
+          <span>{t.selectAllModels}</span>
         </button>
       </div>
 
-      {/* Model Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ALL_MODELS.map((model) => {
-          const isSelected = selectedModelIds.includes(model.id)
-          return (
-            <div
-              key={model.id}
-              onClick={() => onToggleModel(model.id)}
-              className={`relative cursor-pointer rounded-2xl p-4 transition-all duration-300 flex flex-col justify-between select-none ${
-                isSelected
-                  ? "bg-background shadow-neu-inset dark:shadow-neu-inset-dark ring-1 ring-cyan-500/60"
-                  : "bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-sm dark:hover:shadow-neu-sm-dark"
-              }`}
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-bold text-sm text-foreground">
-                    {model.name}
-                  </h4>
-                  {isSelected ? (
-                    <CheckCircle2 className="w-4 h-4 text-cyan-500 shrink-0" />
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border border-border shrink-0" />
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-md bg-secondary text-cyan-600 dark:text-cyan-400">
-                    {model.featureExtractor}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground font-mono">
-                    {model.architecture}
-                  </span>
-                </div>
-
-                <p className="text-xs text-muted-foreground mt-2.5 leading-relaxed line-clamp-2">
-                  {model.description}
-                </p>
-              </div>
-
-              {/* Accuracy Metrics Pill */}
-              <div className="mt-4 pt-3 border-t border-border/50">
-                <div className="grid grid-cols-3 gap-1 text-center font-mono text-[10px]">
-                  <div className="p-1 rounded-lg bg-secondary/50">
-                    <div className="text-muted-foreground">EER</div>
-                    <div className="font-bold text-foreground">{model.metrics.eer}</div>
-                  </div>
-                  <div className="p-1 rounded-lg bg-secondary/50">
-                    <div className="text-muted-foreground">F1</div>
-                    <div className="font-bold text-cyan-600 dark:text-cyan-400">{model.metrics.f1}</div>
-                  </div>
-                  <div className="p-1 rounded-lg bg-secondary/50">
-                    <div className="text-muted-foreground">ACC</div>
-                    <div className="font-bold text-emerald-600 dark:text-emerald-400">{model.metrics.accuracy}</div>
-                  </div>
-                </div>
-
-                {model.badge && (
-                  <div className="mt-2 text-right">
-                    <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium">
-                      &bull; {model.badge}
+      {/* Strict Tabular Engineering Grid */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left font-mono text-xs divide-y divide-border">
+          <thead className="bg-surface/50 text-[10px] uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="px-4 py-2.5 w-12 text-center">SEL</th>
+              <th className="px-4 py-2.5">{t.colModel}</th>
+              <th className="px-4 py-2.5">{t.colExtractor}</th>
+              <th className="px-4 py-2.5">{t.colArch}</th>
+              <th className="px-4 py-2.5 text-right">{t.colEer}</th>
+              <th className="px-4 py-2.5 text-right">{t.colF1}</th>
+              <th className="px-4 py-2.5 text-right">{t.colAcc}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border bg-background">
+            {ALL_MODELS.map((model, idx) => {
+              const isSelected = selectedModelIds.includes(model.id)
+              return (
+                <tr
+                  key={model.id}
+                  onClick={() => onToggleModel(model.id)}
+                  className={`cursor-pointer transition-colors select-none ${
+                    isSelected
+                      ? "bg-surface font-semibold text-foreground"
+                      : "text-muted-foreground hover:bg-surface/40 hover:text-foreground"
+                  }`}
+                >
+                  <td className="px-4 py-3 text-center">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {}}
+                      className="accent-foreground cursor-pointer"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-foreground">{model.name}</span>
+                      {model.badge && (
+                        <span className="text-[9px] px-1.5 py-0.5 border border-border text-muted-foreground uppercase">
+                          {model.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] font-sans text-muted-foreground mt-0.5 line-clamp-1">
+                      {model.description}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="px-1.5 py-0.5 border border-border bg-background text-[10px]">
+                      {model.featureExtractor}
                     </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
+                  </td>
+                  <td className="px-4 py-3 text-[11px] text-muted-foreground">
+                    {model.architecture}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-foreground">
+                    {model.metrics.eer}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-foreground">
+                    {model.metrics.f1}
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-foreground">
+                    {model.metrics.accuracy}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )

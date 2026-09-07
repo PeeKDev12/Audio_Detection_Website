@@ -1,74 +1,72 @@
 import React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sparkles, Info, ArrowDown, Play, CheckCircle2 } from "lucide-react"
+import { ArrowDown, Play } from "lucide-react"
+import { type Language, translations } from "../lib/i18n"
 
 interface FirstRunModalProps {
   isOpen: boolean
   onConfirmAndRun: () => void
   onExploreModels: () => void
+  language: Language
 }
 
 export const FirstRunModal: React.FC<FirstRunModalProps> = ({
   isOpen,
   onConfirmAndRun,
   onExploreModels,
+  language,
 }) => {
   if (!isOpen) return null
+  const t = translations[language]
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-none">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative max-w-lg w-full rounded-3xl bg-background p-6 sm:p-8 shadow-neu-lg dark:shadow-neu-lg-dark border border-border/80 space-y-6"
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+          className="relative max-w-lg w-full bg-background border border-foreground p-6 sm:p-8 space-y-6 shadow-none font-mono"
         >
-          {/* Header Icon */}
-          <div className="flex items-center gap-3.5">
-            <div className="p-3.5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-cyan-600 dark:text-cyan-400">
-              <Sparkles className="w-6 h-6" />
+          {/* Header */}
+          <div className="border-b border-border pb-3">
+            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              [DISPATCH // 2026-ASV]
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-foreground">
-                Model Configuration Notice
-              </h3>
-              <p className="text-xs text-muted-foreground font-mono">
-                First-time Analysis Interception
-              </p>
-            </div>
+            <h3 className="text-sm sm:text-base font-bold text-foreground mt-1 uppercase tracking-tight">
+              {t.modalTitle}
+            </h3>
           </div>
 
-          {/* Body Notice */}
-          <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark space-y-2.5 text-xs sm:text-sm text-foreground/90 leading-relaxed">
-            <p className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-              <span>
-                You are currently using the default <strong className="text-cyan-600 dark:text-cyan-400">LFCC-VAJA+Genuine</strong> model.
-              </span>
-            </p>
-            <p className="text-muted-foreground text-xs pl-6">
-              Feel free to explore and select other models (such as ResNet34 PA/LA or AASIST), enable multi-model comparison, or proceed with the default setup now.
+          {/* Notice Body */}
+          <div className="p-4 bg-surface border border-border space-y-2 text-xs text-foreground/90 font-sans leading-relaxed">
+            <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-foreground">
+              &bull; {t.modalNoticeHeader}
+            </div>
+            <p className="text-muted-foreground text-xs">
+              {t.modalNoticeText}
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+          {/* Stark Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 font-mono text-xs font-bold uppercase">
             <button
+              type="button"
               onClick={onExploreModels}
-              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-1/2 py-3 px-4 border border-border hover:bg-surface text-foreground transition-colors flex items-center justify-center gap-2"
             >
-              <ArrowDown className="w-4 h-4 text-muted-foreground" />
-              <span>Explore Models First</span>
+              <ArrowDown className="w-3.5 h-3.5" />
+              <span>{t.modalExplore}</span>
             </button>
 
             <button
+              type="button"
               onClick={onConfirmAndRun}
-              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-cyan-600 dark:text-cyan-400 transition-all flex items-center justify-center gap-2 border border-cyan-500/30"
+              className="w-full sm:w-1/2 py-3 px-4 bg-foreground text-background hover:opacity-85 transition-opacity flex items-center justify-center gap-2"
             >
-              <Play className="w-4 h-4 fill-current" />
-              <span>Confirm & Run Analysis</span>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>{t.modalConfirm}</span>
             </button>
           </div>
         </motion.div>

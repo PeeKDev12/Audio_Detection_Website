@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react"
-import { History, Search, Trash2, RefreshCw, ShieldCheck, ShieldAlert } from "lucide-react"
+import { Search, Trash2, RefreshCw } from "lucide-react"
 import { apiService } from "../services/api"
 import type { PredictionHistoryItem } from "../types"
+import { type Language, translations } from "../lib/i18n"
 
-export const HistoryView: React.FC = () => {
+interface HistoryViewProps {
+  language: Language
+}
+
+export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
   const [history, setHistory] = useState<PredictionHistoryItem[]>([])
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterLabel, setFilterLabel] = useState<"ALL" | "Real" | "Fake">("ALL")
+  const t = translations[language]
 
   const fetchHistory = async () => {
     setLoading(true)
     try {
       const data = await apiService.getHistory()
-      // Sort newest first by ID or timestamp
       const sorted = [...data].sort((a, b) => b.id - a.id)
       setHistory(sorted)
     } catch (err) {
@@ -46,129 +51,135 @@ export const HistoryView: React.FC = () => {
   })
 
   return (
-    <section id="history" className="py-12 space-y-6">
+    <section id="history" className="py-16 space-y-8 hairline-t">
       {/* Header & Refresh */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 font-mono">
         <div>
-          <h2 className="text-2xl font-extrabold text-foreground flex items-center gap-2">
-            <History className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
-            <span>Detection Audit History</span>
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
+            [SQLITE_AUDIT_LOG]
+          </span>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground uppercase">
+            {t.historyTitle}
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Persisted historical runs logged in the SQLite backend database (sorted newest first)
+          <p className="text-xs text-muted-foreground mt-1 font-sans">
+            {t.historySubtitle}
           </p>
         </div>
 
         <button
+          type="button"
           onClick={fetchHistory}
           disabled={loading}
-          className="px-4 py-2.5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-foreground transition-all flex items-center gap-2 self-start sm:self-auto border border-border/40"
+          className="px-4 py-2 border border-border bg-background hover:bg-surface text-xs font-bold text-foreground uppercase transition-colors flex items-center gap-2 self-start sm:self-auto"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
-          <span>Refresh Records</span>
+          <span>{t.refreshLogs}</span>
         </button>
       </div>
 
-      {/* Toolbar: Search and Filter Pills */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
+      {/* Toolbar: Search and Filter Tabs */}
+      <div className="flex flex-col sm:flex-row items-center gap-3 font-mono text-xs">
         <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search filenames in audit log..."
+            placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-all"
+            className="w-full pl-9 pr-4 py-2.5 bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground transition-colors text-xs"
           />
         </div>
 
-        <div className="flex items-center gap-2 self-stretch sm:self-auto">
+        <div className="flex items-center gap-1.5 self-stretch sm:self-auto">
           <button
+            type="button"
             onClick={() => setFilterLabel("ALL")}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            className={`px-3 py-2 border border-border uppercase transition-colors ${
               filterLabel === "ALL"
-                ? "shadow-neu-inset dark:shadow-neu-inset-dark text-cyan-600 dark:text-cyan-400"
-                : "shadow-neu-flat dark:shadow-neu-flat-dark text-muted-foreground hover:text-foreground"
+                ? "bg-foreground text-background font-bold"
+                : "bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
-            All ({history.length})
+            {t.filterAll} [{history.length}]
           </button>
           <button
+            type="button"
             onClick={() => setFilterLabel("Real")}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            className={`px-3 py-2 border border-border uppercase transition-colors ${
               filterLabel === "Real"
-                ? "shadow-neu-inset dark:shadow-neu-inset-dark text-emerald-600 dark:text-emerald-400"
-                : "shadow-neu-flat dark:shadow-neu-flat-dark text-muted-foreground hover:text-foreground"
+                ? "bg-foreground text-background font-bold"
+                : "bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
-            Real
+            {t.filterReal}
           </button>
           <button
+            type="button"
             onClick={() => setFilterLabel("Fake")}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            className={`px-3 py-2 border border-border uppercase transition-colors ${
               filterLabel === "Fake"
-                ? "shadow-neu-inset dark:shadow-neu-inset-dark text-rose-600 dark:text-rose-400"
-                : "shadow-neu-flat dark:shadow-neu-flat-dark text-muted-foreground hover:text-foreground"
+                ? "bg-foreground text-background font-bold"
+                : "bg-background text-muted-foreground hover:text-foreground"
             }`}
           >
-            Fake
+            {t.filterFake}
           </button>
         </div>
       </div>
 
-      {/* History Log Container */}
-      <div className="rounded-3xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark overflow-hidden p-4 sm:p-6">
+      {/* Table Ledger Container */}
+      <div className="border border-border font-mono text-xs">
         {loading ? (
-          <div className="p-12 text-center text-xs text-muted-foreground animate-pulse font-mono">
-            Fetching audit logs from backend...
+          <div className="p-12 text-center text-muted-foreground uppercase tracking-widest text-[11px]">
+            [FETCHING_DATABASE_LEDGER...]
           </div>
         ) : filteredHistory.length === 0 ? (
-          <div className="p-12 text-center text-xs text-muted-foreground">
-            No matching detection records found.
+          <div className="p-12 text-center text-muted-foreground text-xs">
+            {t.emptyHistory}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-sm">
-              <thead className="text-muted-foreground uppercase text-[10px] font-mono border-b border-border/50">
+            <table className="w-full text-left divide-y divide-border">
+              <thead className="bg-surface/50 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">ID</th>
-                  <th className="px-4 py-3">Audio Filename</th>
-                  <th className="px-4 py-3">Verdict</th>
-                  <th className="px-4 py-3">Confidence</th>
-                  <th className="px-4 py-3">Recorded Date</th>
-                  <th className="px-4 py-3 text-right">Action</th>
+                  <th className="px-4 py-3">{t.tableId}</th>
+                  <th className="px-4 py-3">{t.tableFilename}</th>
+                  <th className="px-4 py-3">{t.tableVerdict}</th>
+                  <th className="px-4 py-3">{t.tableConfidence}</th>
+                  <th className="px-4 py-3">{t.tableTimestamp}</th>
+                  <th className="px-4 py-3 text-right">{t.tableAction}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/40 font-medium">
+              <tbody className="divide-y divide-border bg-background">
                 {filteredHistory.map((item) => {
                   const isReal = item.label.toLowerCase() === "real"
                   return (
-                    <tr key={item.id} className="hover:bg-secondary/20 transition-colors">
-                      <td className="px-4 py-3.5 font-mono text-muted-foreground">#{item.id}</td>
-                      <td className="px-4 py-3.5 text-foreground max-w-xs truncate">{item.filename}</td>
-                      <td className="px-4 py-3.5">
+                    <tr key={item.id} className="hover:bg-surface/40 transition-colors">
+                      <td className="px-4 py-3 font-bold text-muted-foreground">#{item.id}</td>
+                      <td className="px-4 py-3 font-bold text-foreground max-w-xs truncate">{item.filename}</td>
+                      <td className="px-4 py-3">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border ${
+                          className={`px-2 py-0.5 text-[10px] font-bold uppercase border ${
                             isReal
-                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                              : "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400"
+                              ? "border-emerald-600/60 text-emerald-600 dark:text-emerald-400"
+                              : "border-rose-600/60 text-rose-600 dark:text-rose-400"
                           }`}
                         >
-                          {isReal ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
                           {item.label}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5 font-mono font-bold text-foreground">
+                      <td className="px-4 py-3 font-bold text-foreground">
                         {item.confidence}
                       </td>
-                      <td className="px-4 py-3.5 text-muted-foreground text-xs font-mono">
-                        {new Date(item.timestamp).toLocaleString()}
+                      <td className="px-4 py-3 text-muted-foreground text-[11px]">
+                        {new Date(item.timestamp).toISOString().replace("T", " ").substring(0, 19)}
                       </td>
-                      <td className="px-4 py-3.5 text-right">
+                      <td className="px-4 py-3 text-right">
                         <button
+                          type="button"
                           onClick={() => handleDelete(item.id)}
-                          className="p-2 rounded-xl text-muted-foreground hover:text-rose-500 shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all"
-                          title="Delete Record"
+                          className="p-1 text-muted-foreground hover:text-rose-500 transition-colors"
+                          title="Delete entry"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
