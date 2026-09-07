@@ -1,4 +1,4 @@
-﻿from typing import List
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -10,8 +10,15 @@ router = APIRouter(tags=["History"])
 
 
 @router.get("/history", response_model=List[PredictionHistoryItem])
-def get_prediction_history(db: Session = Depends(get_db)):
-    results = db.query(Prediction).order_by(Prediction.id.desc()).all()
+def get_prediction_history(
+    limit: int = 10,
+    offset: int = 0,
+    db: Session = Depends(get_db)
+):
+    query = db.query(Prediction).order_by(Prediction.id.desc())
+    if limit > 0:
+        query = query.offset(offset).limit(limit)
+    results = query.all()
     return [
         PredictionHistoryItem(
             id=r.id,

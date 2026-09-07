@@ -1,6 +1,6 @@
 import React from "react"
 import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { ArrowDown, ShieldCheck, Waves, Cpu } from "lucide-react"
 import { type Language, translations } from "../lib/i18n"
 
 interface HeroProps {
@@ -16,91 +16,83 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
   }
 
   return (
-    <section id="home" className="pt-12 pb-16 md:pt-20 md:pb-24 hairline-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-        {/* Specification Top Index */}
+    <section id="home" className="pt-10 pb-14 md:pt-16 md:pb-20">
+      <div className="max-w-5xl mx-auto text-center space-y-8">
+        {/* Main Heading without herotag */}
         <motion.div
-          key={`tag-${language}`}
-          initial={{ opacity: 0, y: -5 }}
+          key={`title-${language}`}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex flex-wrap items-center justify-between gap-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground border-b border-border pb-3"
+          transition={{ duration: 0.4 }}
+          className="space-y-4"
         >
-          <span>{t.heroTag}</span>
-          <span>ARCH // RESNET34 + AASIST-GAT</span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight">
+            <span>{t.heroTitleLine1} </span>
+            <span className="text-primary">{t.heroTitleLine2} </span>
+            <span>{t.heroTitleLine3}</span>
+          </h1>
+          <p className="max-w-3xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed pt-1">
+            {t.heroDescription}
+          </p>
         </motion.div>
 
-        {/* Stark Editorial Hero Typography */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
-          <motion.div
-            key={`title-${language}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="lg:col-span-8 space-y-2"
-          >
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground leading-[1.05] uppercase">
-              <div>{t.heroTitleLine1}</div>
-              <div>{t.heroTitleLine2}</div>
-              <div className="text-muted-foreground">{t.heroTitleLine3}</div>
-            </h1>
-          </motion.div>
-
-          {/* Right Column / Description & CTA */}
-          <motion.div
-            key={`desc-${language}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-4 space-y-6 lg:border-l lg:border-border lg:pl-8"
-          >
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              {t.heroDescription}
-            </p>
-
-            {/* Sharp Flat Monochromatic CTA */}
-            <div>
-              <button
-                type="button"
-                onClick={scrollToDetection}
-                className="group w-full sm:w-auto inline-flex items-center justify-between gap-6 px-6 py-4 bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider hover:bg-muted-foreground transition-colors"
-              >
-                <span>{t.heroCta}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </button>
+        {/* Technical Metric Spec Cards */}
+        <motion.div
+          key={`metrics-${language}`}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 max-w-4xl mx-auto"
+        >
+          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+              <Waves className="w-3.5 h-3.5 text-primary" />
+              <span>{t.heroMetric1Label}</span>
             </div>
-          </motion.div>
-        </div>
-
-        {/* Technical Metric Spec Sheet Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border font-mono">
-          <div className="p-4 bg-surface/50">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
-              {t.heroMetric1Label}
-            </span>
             <span className="text-sm sm:text-base font-bold text-foreground">
               {t.heroMetric1Val}
             </span>
           </div>
 
-          <div className="p-4 bg-surface/50">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
-              {t.heroMetric2Label}
-            </span>
+          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+              <span>{t.heroMetric2Label}</span>
+            </div>
             <span className="text-sm sm:text-base font-bold text-foreground">
               {t.heroMetric2Val}
             </span>
           </div>
 
-          <div className="p-4 bg-surface/50">
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
-              {t.heroMetric3Label}
-            </span>
+          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+              <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+              <span>{t.heroMetric3Label}</span>
+            </div>
             <span className="text-sm sm:text-base font-bold text-foreground">
               {t.heroMetric3Val}
             </span>
           </div>
-        </div>
+        </motion.div>
+
+        {/* Prominent CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="pt-2"
+        >
+          <button
+            type="button"
+            onClick={scrollToDetection}
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-3xl bg-background text-base sm:text-lg font-bold text-foreground shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark active:scale-[0.98] transition-all duration-200 border border-border/40"
+          >
+            <span className="text-primary font-extrabold">{t.heroCta}</span>
+            <div className="p-1.5 rounded-full bg-primary/10 text-primary shadow-neu-sm dark:shadow-neu-sm-dark group-hover:translate-y-0.5 transition-transform">
+              <ArrowDown className="w-4 h-4" />
+            </div>
+          </button>
+        </motion.div>
       </div>
     </section>
   )

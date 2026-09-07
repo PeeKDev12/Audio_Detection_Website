@@ -1,6 +1,6 @@
 import React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowDown, Play } from "lucide-react"
+import { Info, ArrowDown, Play } from "lucide-react"
 import { type Language, translations } from "../lib/i18n"
 
 interface FirstRunModalProps {
@@ -21,51 +21,56 @@ export const FirstRunModal: React.FC<FirstRunModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-none">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.98 }}
-          transition={{ duration: 0.2 }}
-          className="relative max-w-lg w-full bg-background border border-foreground p-6 sm:p-8 space-y-6 shadow-none font-mono"
+          initial={{ opacity: 0, scale: 0.92, y: 15 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.92, y: 15 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="relative max-w-lg w-full bg-background rounded-3xl p-6 sm:p-8 shadow-neu-lg dark:shadow-neu-lg-dark border border-border/40 space-y-6"
         >
           {/* Header */}
-          <div className="border-b border-border pb-3">
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              [DISPATCH // 2026-ASV]
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-primary">
+              <Info className="w-5 h-5" />
             </div>
-            <h3 className="text-sm sm:text-base font-bold text-foreground mt-1 uppercase tracking-tight">
-              {t.modalTitle}
-            </h3>
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground">
+                {t.modalTitle}
+              </h3>
+              <p className="text-xs text-muted-foreground font-mono">
+                First-time Run Interception
+              </p>
+            </div>
           </div>
 
           {/* Notice Body */}
-          <div className="p-4 bg-surface border border-border space-y-2 text-xs text-foreground/90 font-sans leading-relaxed">
-            <div className="font-mono text-[11px] font-bold uppercase tracking-wider text-foreground">
-              &bull; {t.modalNoticeHeader}
+          <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark space-y-2 text-xs sm:text-sm text-foreground/90 leading-relaxed">
+            <div className="font-semibold text-primary">
+              {t.modalNoticeHeader}
             </div>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-xs leading-relaxed">
               {t.modalNoticeText}
             </p>
           </div>
 
-          {/* Stark Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 font-mono text-xs font-bold uppercase">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
             <button
               type="button"
               onClick={onExploreModels}
-              className="w-full sm:w-1/2 py-3 px-4 border border-border hover:bg-surface text-foreground transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2"
             >
-              <ArrowDown className="w-3.5 h-3.5" />
+              <ArrowDown className="w-4 h-4 text-muted-foreground" />
               <span>{t.modalExplore}</span>
             </button>
 
             <button
               type="button"
               onClick={onConfirmAndRun}
-              className="w-full sm:w-1/2 py-3 px-4 bg-foreground text-background hover:opacity-85 transition-opacity flex items-center justify-center gap-2"
+              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-primary transition-all flex items-center justify-center gap-2 border border-primary/30"
             >
-              <Play className="w-3.5 h-3.5 fill-current" />
+              <Play className="w-4 h-4 fill-current" />
               <span>{t.modalConfirm}</span>
             </button>
           </div>

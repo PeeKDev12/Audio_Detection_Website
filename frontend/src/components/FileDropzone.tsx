@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { UploadCloud, FileAudio, Trash2, PlayCircle, ArrowRight } from "lucide-react"
+import { UploadCloud, FileAudio, Trash2, PlayCircle, Waves, ArrowRight } from "lucide-react"
 import { AudioWaveform } from "./AudioWaveform"
 import { type Language, translations } from "../lib/i18n"
 
@@ -74,16 +74,16 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Strict Minimal Dropzone Box */}
+      {/* Neumorphic Drop Area */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border border-dashed p-8 sm:p-10 text-center cursor-pointer transition-colors ${
+        className={`group relative rounded-3xl p-8 sm:p-10 text-center cursor-pointer transition-all duration-300 ${
           isDragOver
-            ? "border-foreground bg-surface"
-            : "border-border hover:border-foreground hover:bg-surface/40 bg-background"
+            ? "shadow-neu-inset dark:shadow-neu-inset-dark ring-2 ring-primary scale-[0.99]"
+            : "bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-sm dark:hover:shadow-neu-sm-dark"
         }`}
       >
         <input
@@ -95,16 +95,18 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
           onChange={handleFileInputChange}
         />
 
-        <div className="flex flex-col items-center justify-center space-y-3 font-mono">
-          <UploadCloud className="w-8 h-8 text-foreground" />
+        <div className="flex flex-col items-center justify-center space-y-3">
+          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark group-hover:shadow-neu-inset dark:group-hover:shadow-neu-inset-dark text-primary transition-all duration-200">
+            <UploadCloud className="w-8 h-8" />
+          </div>
           <div>
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-foreground">
+            <p className="text-sm sm:text-base font-bold text-foreground">
               {t.dropzoneTitle}
             </p>
-            <p className="text-[11px] text-muted-foreground mt-1 underline underline-offset-4">
+            <p className="text-xs text-primary font-medium mt-1 underline underline-offset-4">
               {t.dropzoneBrowse}
             </p>
-            <p className="text-[10px] text-muted-foreground mt-2">
+            <p className="text-[11px] text-muted-foreground mt-2 font-mono">
               {t.dropzoneFormats}
             </p>
           </div>
@@ -112,55 +114,62 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
       </div>
 
       {/* Waveform Inspection Monitor */}
-      <div className="border border-border space-y-3">
-        <div className="p-3 bg-surface border-b border-border flex items-center justify-between font-mono text-xs">
-          <span className="font-bold tracking-wider uppercase text-foreground">
-            {t.waveformTitle}
-          </span>
+      <div className="rounded-3xl p-6 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-border/40">
+          <div className="flex items-center gap-2">
+            <Waves className="w-4 h-4 text-primary" />
+            <h4 className="text-sm font-bold text-foreground">
+              {t.waveformTitle}
+            </h4>
+          </div>
           {selectedPreviewFile && (
-            <span className="text-[10px] text-muted-foreground truncate max-w-[200px]">
-              [{selectedPreviewFile.name}]
+            <span className="text-xs font-mono text-primary truncate max-w-[200px]">
+              {selectedPreviewFile.name}
             </span>
           )}
         </div>
 
-        <div className="p-4">
+        <div>
           {selectedPreviewFile ? (
-            <AudioWaveform file={selectedPreviewFile} height={70} />
+            <AudioWaveform file={selectedPreviewFile} height={75} />
           ) : (
-            <div className="py-10 text-center font-mono text-xs text-muted-foreground uppercase tracking-wider border border-dashed border-border/70">
+            <div className="py-10 text-center text-xs text-muted-foreground bg-background rounded-2xl shadow-neu-inset dark:shadow-neu-inset-dark p-6">
               {t.noFileSelected}
             </div>
           )}
         </div>
       </div>
 
-      {/* Ingestion Queue Table */}
+      {/* Ingestion Queue Card */}
       {files.length > 0 && (
-        <div className="border border-border space-y-3 animate-in fade-in duration-200">
-          <div className="p-3 bg-surface border-b border-border flex items-center justify-between font-mono text-xs">
-            <span className="font-bold tracking-wider text-foreground uppercase">
-              {t.queueTitle} [{files.length}]
-            </span>
+        <div className="rounded-3xl p-6 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4 animate-in fade-in duration-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileAudio className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-foreground">
+                {t.queueTitle} ({files.length})
+              </span>
+            </div>
             <button
+              type="button"
               onClick={onClearAll}
               disabled={isAnalyzing}
-              className="text-[11px] text-muted-foreground hover:text-foreground hover:underline transition-colors"
+              className="text-xs text-muted-foreground hover:text-rose-500 font-medium transition-colors"
             >
-              [{t.clearQueue}]
+              {t.clearQueue}
             </button>
           </div>
 
-          <div className="max-h-52 overflow-y-auto divide-y divide-border">
+          <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
             {files.map((file, idx) => {
               const isSelected = selectedPreviewFile === file
               return (
                 <div
                   key={`${file.name}-${idx}`}
-                  className={`flex items-center justify-between p-3 font-mono text-xs transition-colors ${
+                  className={`flex items-center justify-between p-3 rounded-2xl transition-all select-none ${
                     isSelected
-                      ? "bg-surface font-bold text-foreground"
-                      : "text-muted-foreground hover:bg-surface/50 hover:text-foreground"
+                      ? "shadow-neu-inset dark:shadow-neu-inset-dark ring-1 ring-primary/40 bg-secondary/20"
+                      : "shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark bg-background"
                   }`}
                 >
                   <div
@@ -168,25 +177,26 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
                     onClick={() => onSelectPreviewFile(file)}
                   >
                     <PlayCircle
-                      className={`w-3.5 h-3.5 shrink-0 ${
-                        isSelected ? "text-foreground" : "text-muted-foreground"
+                      className={`w-4 h-4 shrink-0 ${
+                        isSelected ? "text-primary" : "text-muted-foreground"
                       }`}
                     />
                     <div className="truncate">
-                      <span className="truncate">{file.name}</span>
-                      <span className="text-[10px] text-muted-foreground ml-2">
-                        [{formatFileSize(file.size)}]
+                      <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        {formatFileSize(file.size)}
                       </span>
                     </div>
                   </div>
 
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       onFileRemoved(idx)
                     }}
                     disabled={isAnalyzing}
-                    className="p-1 text-muted-foreground hover:text-foreground ml-2"
+                    className="p-1.5 rounded-xl text-muted-foreground hover:text-rose-500 shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all ml-2"
                     title="Remove file"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -196,15 +206,15 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
             })}
           </div>
 
-          {/* Stark Action Button */}
-          <div className="p-3 bg-surface border-t border-border">
+          {/* Action Button */}
+          <div className="pt-2">
             <button
               type="button"
               onClick={onRunClick}
               disabled={isAnalyzing || files.length === 0}
-              className="w-full py-3.5 px-4 bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity flex items-center justify-center gap-3"
+              className="w-full py-4 px-6 rounded-2xl bg-background text-primary font-bold text-sm sm:text-base shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 border border-border/40"
             >
-              <span>{isAnalyzing ? t.runningButton : `${t.runButton} [${files.length}]`}</span>
+              <span>{isAnalyzing ? t.runningButton : `${t.runButton} (${files.length})`}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

@@ -33,8 +33,10 @@ export const apiService = {
     return res.data
   },
 
-  async getHistory(): Promise<PredictionHistoryItem[]> {
-    const res = await apiClient.get<PredictionHistoryItem[]>("/history")
+  async getHistory(limit: number = 10, offset: number = 0): Promise<PredictionHistoryItem[]> {
+    const res = await apiClient.get<PredictionHistoryItem[]>("/history", {
+      params: { limit, offset },
+    })
     return res.data
   },
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { Header } from "./components/Header"
 import { Hero } from "./components/Hero"
 import { ModelSelector, ALL_MODELS } from "./components/ModelSelector"
@@ -16,7 +15,7 @@ import { type Language, translations } from "./lib/i18n"
 import { AlertCircle } from "lucide-react"
 
 export function App() {
-  // Light mode is default (false), Dark mode is OLED black (true)
+  // Light mode is default (false), Dark mode is soft matte (true)
   const [darkMode, setDarkMode] = useState(false)
   
   // Bilingual state: "en" | "th"
@@ -189,7 +188,7 @@ export function App() {
     .join(", ")
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-foreground selection:text-background">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-primary/20 selection:text-primary">
       {/* First Run Interception Modal */}
       <FirstRunModal
         isOpen={isFirstRunModalOpen}
@@ -198,24 +197,23 @@ export function App() {
         language={language}
       />
 
-      {/* Sticky Razor-thin Minimal Header */}
+      {/* Sticky Clean Header */}
       <Header
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         language={language}
         setLanguage={setLanguage}
-        backendOnline={backendOnline}
       />
 
-      {/* Main Content */}
+      {/* Main Content Sections */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Offline Warning Strip */}
         {!backendOnline && (
-          <div className="mt-4 p-3 border border-border bg-surface font-mono text-xs flex items-center justify-between text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-rose-500" />
+          <div className="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
               <span>
-                [BACKEND_OFFLINE] FastAPI server not detected at http://127.0.0.1:8000. Start backend using `python main.py`.
+                Backend server is currently offline at <code className="font-mono font-semibold">http://127.0.0.1:8000</code>. Start FastAPI using <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded">python main.py</code> in the backend folder.
               </span>
             </div>
           </div>
@@ -223,16 +221,17 @@ export function App() {
 
         {/* Global Error Strip */}
         {errorMessage && (
-          <div className="mt-4 p-3 border border-rose-500 bg-rose-500/10 font-mono text-xs flex items-center justify-between text-rose-600 dark:text-rose-400">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="mt-4 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
               <span>{errorMessage}</span>
             </div>
             <button
+              type="button"
               onClick={() => setErrorMessage(null)}
-              className="text-xs uppercase font-bold hover:underline"
+              className="text-xs uppercase font-bold underline"
             >
-              [DISMISS]
+              Dismiss
             </button>
           </div>
         )}
@@ -241,15 +240,12 @@ export function App() {
         <Hero language={language} />
 
         {/* 2. Asymmetrical Scrollytelling Detection Section */}
-        <section id="detection" className="py-12 space-y-10 scroll-mt-20">
-          <div className="space-y-1">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground block">
-              [INFERENCE_SECTION]
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground uppercase">
+        <section id="detection" className="py-10 space-y-8 scroll-mt-24">
+          <div className="text-center max-w-3xl mx-auto space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {t.sectionDetectionTitle}
             </h2>
-            <p className="text-xs text-muted-foreground font-sans max-w-2xl">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {t.sectionDetectionSubtitle}
             </p>
           </div>
@@ -257,7 +253,7 @@ export function App() {
           {/* 50/50 Asymmetrical Scrollytelling Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column: Sticky Audio Ingestion & Waveform */}
-            <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
+            <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
               <FileDropzone
                 files={files}
                 onFilesAdded={handleFilesAdded}
@@ -273,7 +269,7 @@ export function App() {
 
             {/* Right Column: Model Registry & Results Stream */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Model Selection Registry Table */}
+              {/* Model Selection Registry */}
               <ModelSelector
                 selectedModelIds={selectedModelIds}
                 onToggleModel={handleToggleModel}
@@ -282,7 +278,7 @@ export function App() {
                 language={language}
               />
 
-              {/* Faux Geometric Progress Bar */}
+              {/* Faux Progress Bar */}
               <FauxProgressBar
                 isAnalyzing={isAnalyzing}
                 isComplete={isAnalysisComplete}
@@ -290,7 +286,7 @@ export function App() {
                 language={language}
               />
 
-              {/* Results Ledger Stream */}
+              {/* Results Stream */}
               {results.length > 0 && (
                 <ResultsDisplay
                   results={results}
@@ -306,12 +302,12 @@ export function App() {
         </section>
 
         {/* 3. Historical Audit Ledger */}
-        <div className="scroll-mt-20">
+        <div className="scroll-mt-24">
           <HistoryView language={language} />
         </div>
 
         {/* 4. Technical Architectures Guide */}
-        <div className="scroll-mt-20">
+        <div className="scroll-mt-24">
           <ModelsGuide language={language} />
         </div>
       </main>

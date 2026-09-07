@@ -1,6 +1,6 @@
 import React from "react"
 import { motion } from "framer-motion"
-import { Download } from "lucide-react"
+import { ShieldCheck, ShieldAlert, AlertTriangle, Download, Sparkles } from "lucide-react"
 import type { PredictionResult } from "../types"
 import { type Language, translations } from "../lib/i18n"
 
@@ -55,101 +55,96 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6 pt-6 font-mono"
+      className="space-y-6 pt-4"
     >
-      {/* Metric Ledger Summary Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border">
-        <div className="p-4 bg-surface/50">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
-            {t.summaryTotal}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold text-foreground mt-1 block">
-            {total}
-          </span>
+      {/* Metric Summary Grid (Clean Flat Cards with minimal borders) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+        <div className="rounded-2xl p-4 bg-card/60 border border-border/80 flex flex-col justify-between">
+          <span className="text-xs font-semibold text-muted-foreground">{t.summaryTotal}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-foreground mt-1.5">{total}</span>
         </div>
 
-        <div className="p-4 bg-surface/50">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
-            {t.summaryReal}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold text-foreground mt-1 block">
-            {realCount}
-          </span>
+        <div className="rounded-2xl p-4 bg-card/60 border border-border/80 flex flex-col justify-between">
+          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{t.summaryReal}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1.5">{realCount}</span>
         </div>
 
-        <div className="p-4 bg-surface/50">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
-            {t.summaryFake}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold text-foreground mt-1 block">
-            {fakeCount}
-          </span>
+        <div className="rounded-2xl p-4 bg-card/60 border border-border/80 flex flex-col justify-between">
+          <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">{t.summaryFake}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 mt-1.5">{fakeCount}</span>
         </div>
 
-        <div className="p-4 bg-surface/50">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">
-            {t.summaryAvgConf}
-          </span>
-          <span className="text-xl sm:text-2xl font-bold text-foreground mt-1 block">
-            {avgConfidence}%
-          </span>
+        <div className="rounded-2xl p-4 bg-card/60 border border-border/80 flex flex-col justify-between">
+          <span className="text-xs font-semibold text-primary">{t.summaryAvgConf}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-primary mt-1.5">{avgConfidence}%</span>
         </div>
       </div>
 
       {/* Action Header & Exports */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-        <span className="text-xs font-bold uppercase tracking-wider text-foreground">
-          {t.resultsTitle}
-        </span>
+        <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span>{t.resultsTitle}</span>
+        </h3>
 
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={exportCSV}
-            className="px-3 py-1.5 border border-border hover:bg-surface text-xs font-bold text-foreground transition-colors flex items-center gap-1.5 uppercase"
+            className="px-3 py-1.5 rounded-xl border border-border/80 bg-card/60 hover:bg-secondary/40 text-xs font-semibold text-foreground transition-all flex items-center gap-1.5"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-primary" />
             <span>{t.exportCsv}</span>
           </button>
           <button
             type="button"
             onClick={exportJSON}
-            className="px-3 py-1.5 border border-border hover:bg-surface text-xs font-bold text-foreground transition-colors flex items-center gap-1.5 uppercase"
+            className="px-3 py-1.5 rounded-xl border border-border/80 bg-card/60 hover:bg-secondary/40 text-xs font-semibold text-foreground transition-all flex items-center gap-1.5"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-primary" />
             <span>{t.exportJson}</span>
           </button>
         </div>
       </div>
 
-      {/* Results Ledger Entries */}
-      <div className="border border-border divide-y divide-border">
+      {/* Results List (Clean Flat Cards with Crisp Accents) */}
+      <div className="grid grid-cols-1 gap-3">
         {results.map((res, index) => {
           const isReal = res.label?.toLowerCase() === "real"
           const hasError = !!res.error
 
           return (
-            <div
+            <motion.div
               key={`${res.filename}-${index}`}
-              className="p-5 bg-background hover:bg-surface/30 transition-colors space-y-3"
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2, delay: index * 0.03 }}
+              className={`rounded-2xl p-5 border transition-all ${
+                hasError
+                  ? "bg-rose-500/5 border-rose-500/30"
+                  : isReal
+                  ? "bg-emerald-500/5 border-emerald-500/30 hover:border-emerald-500/50"
+                  : "bg-rose-500/5 border-rose-500/30 hover:border-rose-500/50"
+              }`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="space-y-1">
+                <div className="space-y-1 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-bold text-xs sm:text-sm text-foreground break-all">
+                    <span className="font-bold text-sm sm:text-base text-foreground break-all">
                       {res.filename}
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 border border-border text-muted-foreground uppercase">
-                      [{res.model}]
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-secondary text-primary font-semibold">
+                      {res.model}
                     </span>
                   </div>
                   {hasError && (
-                    <div className="text-xs text-rose-500">
-                      [ERROR: {res.error}]
-                    </div>
+                    <p className="text-xs text-rose-500 flex items-center gap-1 pt-1">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      <span>{res.error}</span>
+                    </p>
                   )}
                 </div>
 
@@ -157,34 +152,39 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 {!hasError && (
                   <div className="flex items-center gap-3">
                     <span
-                      className={`px-3 py-1 text-xs font-bold uppercase tracking-wider border ${
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold border ${
                         isReal
-                          ? "border-emerald-600/60 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5"
-                          : "border-rose-600/60 text-rose-600 dark:text-rose-400 bg-rose-500/5"
+                          ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-600 dark:text-emerald-400"
+                          : "bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-400"
                       }`}
                     >
-                      {isReal ? t.verdictReal : t.verdictFake}
+                      {isReal ? <ShieldCheck className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+                      <span>{isReal ? t.verdictReal : t.verdictFake}</span>
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Monospaced Confidence Bar */}
+              {/* Confidence Progress Gauge */}
               {!hasError && (
-                <div className="pt-2 border-t border-border/40 space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                <div className="mt-3.5 pt-3 border-t border-border/40 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
                     <span>{t.confidenceLabel}</span>
                     <span className="font-bold text-foreground">{res.confidence_pct}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-surface border border-border overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-secondary/60 overflow-hidden">
                     <div
-                      className="h-full bg-foreground"
-                      style={{ width: `${Math.min(Math.max(res.confidence_pct, 2), 100)}%` }}
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        isReal
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-400"
+                          : "bg-gradient-to-r from-rose-500 to-amber-400"
+                      }`}
+                      style={{ width: `${Math.min(Math.max(res.confidence_pct, 5), 100)}%` }}
                     />
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
           )
         })}
       </div>
