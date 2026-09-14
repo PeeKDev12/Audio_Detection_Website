@@ -11,6 +11,10 @@ export const translations = {
     navModels: "Model Architectures",
     statusOnline: "API Online",
     statusOffline: "API Offline",
+    serverOfflineTitle: "Server Currently Offline",
+    serverOfflineDesc: "The detection server is currently unreachable. Please try again later or contact the system administrator / developer for assistance.",
+    serverOfflineRetry: "Retry Connection",
+    serverOfflineDismiss: "Dismiss",
 
     // Hero
     heroTag: "Audio Anti-Spoofing & Deepfake Detection",
@@ -136,6 +140,10 @@ export const translations = {
     navModels: "สถาปัตยกรรมโมเดล",
     statusOnline: "ระบบออนไลน์",
     statusOffline: "ระบบออฟไลน์",
+    serverOfflineTitle: "ระบบเซิร์ฟเวอร์ออฟไลน์",
+    serverOfflineDesc: "ไม่สามารถเชื่อมต่อระบบประมวลผลได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง หรือติดต่อผู้ดูแลระบบ / นักพัฒนาเพื่อขอรับการตรวจสอบ",
+    serverOfflineRetry: "ลองเชื่อมต่อใหม่",
+    serverOfflineDismiss: "ปิดหน้าต่าง",
 
     // Hero
     heroTag: "ระบบตรวจจับเสียงสังเคราะห์และป้องกันการปลอมแปลงเสียง",

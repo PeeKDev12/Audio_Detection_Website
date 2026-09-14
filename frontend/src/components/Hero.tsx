@@ -5,6 +5,7 @@ import { type Language, translations } from "../lib/i18n"
 import { TextAnimate } from "@/registry/magicui/text-animate"
 import { AnimatedShinyText } from "@/registry/magicui/animated-shiny-text"
 import { Terminal, TypingAnimation, AnimatedSpan } from "@/registry/magicui/terminal"
+import { AuroraText } from "@/registry/magicui/aurora-text"
 
 interface HeroProps {
   language: Language
@@ -41,15 +42,9 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
               )}
               {t.heroTitleLine2 && (
                 <>
-                  <TextAnimate
-                    animation="blurInUp"
-                    by="character"
-                    once
-                    as="span"
-                    className="text-primary"
-                  >
+                  <AuroraText>
                     {t.heroTitleLine2}
-                  </TextAnimate>{" "}
+                  </AuroraText>{" "}
                 </>
               )}
               {t.heroTitleLine3 && (

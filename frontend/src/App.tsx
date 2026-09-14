@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Header } from "./components/Header"
 import { Hero } from "./components/Hero"
 import { ModelSelector, ALL_MODELS } from "./components/ModelSelector"
@@ -9,6 +9,7 @@ import { HistoryView } from "./components/HistoryView"
 import { ModelsGuide } from "./components/ModelsGuide"
 import { Footer } from "./components/Footer"
 import { FirstRunModal } from "./components/FirstRunModal"
+import { ServerOfflineModal } from "./components/ServerOfflineModal"
 import { SmoothCursor } from "./components/SmoothCursor"
 import { apiService } from "./services/api"
 import type { PredictionResult } from "./types"
@@ -41,8 +42,10 @@ export function App() {
   const [isFirstRunModalOpen, setIsFirstRunModalOpen] = useState(false)
   const [isModelSelectorHighlighted, setIsModelSelectorHighlighted] = useState(false)
 
-  // Backend Health Ping
-  const [backendOnline, setBackendOnline] = useState(false)
+  // Backend Health Ping & Server Offline Modal State
+  const [backendOnline, setBackendOnline] = useState(true)
+  const [isOfflineModalOpen, setIsOfflineModalOpen] = useState(false)
+  const hasShownInitialOfflineAlertRef = useRef(false)
 
   // Apply dark mode class to HTML element
   useEffect(() => {
@@ -54,20 +57,49 @@ export function App() {
   }, [darkMode])
 
   // Backend Health Check
-  useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const health = await apiService.checkHealth()
-        if (health.ok) {
-          setBackendOnline(true)
-        }
-      } catch (err) {
+  const checkStatus = async (isInitialEntry: boolean = false) => {
+    try {
+      const health = await apiService.checkHealth()
+      if (health.ok) {
+        setBackendOnline(true)
+        setIsOfflineModalOpen(false)
+      } else {
         setBackendOnline(false)
+        if (isInitialEntry && !hasShownInitialOfflineAlertRef.current) {
+          hasShownInitialOfflineAlertRef.current = true
+          setIsOfflineModalOpen(true)
+        }
+      }
+    } catch (err) {
+      setBackendOnline(false)
+      if (isInitialEntry && !hasShownInitialOfflineAlertRef.current) {
+        hasShownInitialOfflineAlertRef.current = true
+        setIsOfflineModalOpen(true)
       }
     }
+  }
 
-    checkStatus()
-    const interval = setInterval(checkStatus, 15000)
+  // Manual retry handler (for user clicking "Retry Connection" inside the modal)
+  const handleManualRetry = async () => {
+    try {
+      const health = await apiService.checkHealth()
+      if (health.ok) {
+        setBackendOnline(true)
+        setIsOfflineModalOpen(false)
+      } else {
+        setBackendOnline(false)
+      }
+    } catch (err) {
+      setBackendOnline(false)
+    }
+  }
+
+  useEffect(() => {
+    // Only show the offline modal once on initial entry
+    checkStatus(true)
+    const interval = setInterval(() => {
+      checkStatus(false)
+    }, 15000)
     return () => clearInterval(interval)
   }, [])
 
@@ -121,6 +153,11 @@ export function App() {
   // First-Run Interception Trigger
   const handleRunClick = () => {
     if (files.length === 0) return
+
+    if (!backendOnline) {
+      setIsOfflineModalOpen(true)
+      return
+    }
 
     if (!hasConfirmedFirstRun) {
       setIsFirstRunModalOpen(true)
@@ -176,10 +213,13 @@ export function App() {
       console.error("Inference execution failed:", err)
       setIsAnalyzing(false)
       setIsAnalysisComplete(false)
+      setBackendOnline(false)
+      setIsOfflineModalOpen(true)
       setErrorMessage(
         err.response?.data?.detail ||
-          err.message ||
-          "Failed to execute audio inference. Please ensure the backend server is running."
+          (language === "th"
+            ? "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ประมวลผลได้ กรุณาติดต่อผู้ดูแลระบบหรือนักพัฒนา"
+            : "The detection server is currently unreachable. Please contact the administrator or developer.")
       )
     }
   }
@@ -201,6 +241,14 @@ export function App() {
         language={language}
       />
 
+      {/* Server Offline Alert Dialog */}
+      <ServerOfflineModal
+        isOpen={isOfflineModalOpen}
+        onClose={() => setIsOfflineModalOpen(false)}
+        onRetry={handleManualRetry}
+        language={language}
+      />
+
       {/* Sticky Clean Header */}
       <Header
         darkMode={darkMode}
@@ -211,15 +259,24 @@ export function App() {
 
       {/* Main Content Sections */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Offline Warning Strip */}
+        {/* Offline Warning Strip (Client Friendly) */}
         {!backendOnline && (
-          <div className="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-700 dark:text-amber-300 flex items-center justify-between">
+          <div className="mt-4 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
               <span>
-                Backend server is currently offline at <code className="font-mono font-semibold">http://127.0.0.1:8000</code>. Start FastAPI using <code className="font-mono bg-amber-500/20 px-1 py-0.5 rounded">python main.py</code> in the backend folder.
+                {language === "th"
+                  ? "ระบบเซิร์ฟเวอร์ออฟไลน์ — ไม่สามารถเชื่อมต่อระบบประมวลผลได้ในขณะนี้"
+                  : "Server Offline — The audio inference service is currently unreachable."}
               </span>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsOfflineModalOpen(true)}
+              className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-100 font-semibold transition-all shrink-0 cursor-pointer"
+            >
+              {language === "th" ? "ดูรายละเอียด" : "View Details"}
+            </button>
           </div>
         )}
 

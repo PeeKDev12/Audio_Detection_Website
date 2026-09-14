@@ -49,6 +49,7 @@ export default {
       boxShadow: {},
       animation: {
         "shiny-text": "shiny-text 8s infinite",
+        aurora: "aurora 8s ease-in-out infinite",
       },
       keyframes: {
         "shiny-text": {
@@ -57,6 +58,17 @@ export default {
           },
           "30%, 60%": {
             "background-position": "calc(100% + var(--shiny-width, 100px)) 0",
+          },
+        },
+        aurora: {
+          "0%": {
+            "background-position": "0% 50%",
+          },
+          "50%": {
+            "background-position": "100% 50%",
+          },
+          "100%": {
+            "background-position": "0% 50%",
           },
         },
       },

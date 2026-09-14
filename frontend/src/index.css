@@ -104,3 +104,20 @@ html.custom-cursor-active textarea,
 html.custom-cursor-active [role="button"] {
   cursor: none !important;
 }
+
+@keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-aurora {
+  animation: aurora 8s ease-in-out infinite;
+}
+
