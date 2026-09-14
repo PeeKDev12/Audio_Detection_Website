@@ -18,93 +18,106 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
   }
 
   return (
-    <section id="home" className="pt-10 pb-14 md:pt-16 md:pb-20">
-      <div className="max-w-5xl mx-auto text-center space-y-8">
-        {/* Main Heading without herotag */}
-        <motion.div
-          key={`title-${language}`}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="space-y-4"
-        >
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight">
-            {t.heroTitleLine1 && (
-              <>
+    <section id="home" className="pt-8 pb-12 md:pt-14 md:pb-16 scroll-mt-24">
+      <div className="w-full max-w-7xl mx-auto space-y-12">
+        {/* 2-Column Wide Viewport Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column: Main Hero Copy (Strictly Left-Aligned) */}
+          <motion.div
+            key={`title-${language}`}
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            className="lg:col-span-7 xl:col-span-8 text-left space-y-5"
+          >
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.15]">
+              {t.heroTitleLine1 && (
+                <>
+                  <TextAnimate animation="blurInUp" by="character" once as="span">
+                    {t.heroTitleLine1}
+                  </TextAnimate>{" "}
+                </>
+              )}
+              {t.heroTitleLine2 && (
+                <>
+                  <TextAnimate
+                    animation="blurInUp"
+                    by="character"
+                    once
+                    as="span"
+                    className="text-primary"
+                  >
+                    {t.heroTitleLine2}
+                  </TextAnimate>{" "}
+                </>
+              )}
+              {t.heroTitleLine3 && (
                 <TextAnimate animation="blurInUp" by="character" once as="span">
-                  {t.heroTitleLine1}
-                </TextAnimate>{" "}
-              </>
-            )}
-            {t.heroTitleLine2 && (
-              <>
-                <TextAnimate
-                  animation="blurInUp"
-                  by="character"
-                  once
-                  as="span"
-                  className="text-primary"
-                >
-                  {t.heroTitleLine2}
-                </TextAnimate>{" "}
-              </>
-            )}
-            {t.heroTitleLine3 && (
-              <TextAnimate animation="blurInUp" by="character" once as="span">
-                {t.heroTitleLine3}
-              </TextAnimate>
-            )}
-          </h1>
-          <p className="max-w-3xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed pt-1">
-            {t.heroDescription}
-          </p>
-        </motion.div>
+                  {t.heroTitleLine3}
+                </TextAnimate>
+              )}
+            </h1>
 
-        {/* Technical Metric Spec Cards */}
-        <motion.div
-          key={`metrics-${language}`}
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 max-w-4xl mx-auto"
-        >
-          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-primary/40 hover:bg-muted/30 transition-all">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-              <Waves className="w-3.5 h-3.5 text-primary" />
-              <span>{t.heroMetric1Label}</span>
+            <p className="max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed pt-1">
+              {t.heroDescription}
+            </p>
+          </motion.div>
+
+          {/* Right Column: Vertical Technical Specifications List (Strictly Right-Aligned) */}
+          <motion.div
+            key={`metrics-${language}`}
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className="lg:col-span-5 xl:col-span-4 flex flex-col justify-center space-y-3.5"
+          >
+            {/* Spec 1: Sampling Frequency */}
+            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-muted/30 transition-all">
+              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                  <Waves className="w-4 h-4" />
+                </div>
+                <span>{t.heroMetric1Label}</span>
+              </div>
+              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
+                {t.heroMetric1Val}
+              </span>
             </div>
-            <span className="text-sm sm:text-base font-bold text-foreground">
-              {t.heroMetric1Val}
-            </span>
-          </div>
 
-          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-emerald-500/40 hover:bg-muted/30 transition-all">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              <span>{t.heroMetric2Label}</span>
+            {/* Spec 2: Min-tDCF Benchmark */}
+            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-emerald-500/40 hover:bg-muted/30 transition-all">
+              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
+                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <span>{t.heroMetric2Label}</span>
+              </div>
+              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
+                {t.heroMetric2Val}
+              </span>
             </div>
-            <span className="text-sm sm:text-base font-bold text-foreground">
-              {t.heroMetric2Val}
-            </span>
-          </div>
 
-          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-indigo-500/40 hover:bg-muted/30 transition-all">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-              <Cpu className="w-3.5 h-3.5 text-indigo-500" />
-              <span>{t.heroMetric3Label}</span>
+            {/* Spec 3: Model Graph Architecture */}
+            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-indigo-500/40 hover:bg-muted/30 transition-all">
+              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                  <Cpu className="w-4 h-4" />
+                </div>
+                <span>{t.heroMetric3Label}</span>
+              </div>
+              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
+                {t.heroMetric3Val}
+              </span>
             </div>
-            <span className="text-sm sm:text-base font-bold text-foreground">
-              {t.heroMetric3Val}
-            </span>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
-        {/* Prominent CTA */}
+        {/* Center CTA Button (Bridging Both Columns) */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="pt-2 flex justify-center"
+          className="pt-4 flex justify-center w-full"
         >
           <button
             type="button"

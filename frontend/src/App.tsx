@@ -10,7 +10,6 @@ import { ModelsGuide } from "./components/ModelsGuide"
 import { Footer } from "./components/Footer"
 import { FirstRunModal } from "./components/FirstRunModal"
 import { SmoothCursor } from "./components/SmoothCursor"
-import { FloatingWaypointRail } from "./components/FloatingWaypointRail"
 import { apiService } from "./services/api"
 import type { PredictionResult } from "./types"
 import { type Language, translations } from "./lib/i18n"
@@ -193,9 +192,6 @@ export function App() {
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-primary/20 selection:text-primary">
       {/* Magic UI Smooth Cursor */}
       <SmoothCursor />
-
-      {/* Floating Waypoint Rail Navigation (Sticky TOC) */}
-      <FloatingWaypointRail language={language} />
 
       {/* First Run Interception Modal */}
       <FirstRunModal

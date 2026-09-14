@@ -78,6 +78,26 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
+          {/* Center: Desktop Navigation with Scrollspy Active State */}
+          <nav className="hidden lg:flex items-center space-x-1 text-xs font-semibold">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.id
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`px-3.5 py-2 rounded-xl transition-all duration-200 ${
+                    isActive
+                      ? "text-primary font-bold bg-primary/10 border border-primary/20"
+                      : "text-foreground/80 hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {item.label}
+                </button> 
+              )
+            })}
+          </nav>
+
           {/* Right: Bilingual Switch & Theme Switch */}
           <div className="flex items-center gap-2.5">
             {/* Bilingual Flat Switch */}
