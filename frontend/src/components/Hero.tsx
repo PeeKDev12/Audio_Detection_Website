@@ -1,9 +1,10 @@
 import React from "react"
 import { motion } from "framer-motion"
-import { ArrowDown, ShieldCheck, Waves, Cpu } from "lucide-react"
+import { ArrowDown } from "lucide-react"
 import { type Language, translations } from "../lib/i18n"
 import { TextAnimate } from "@/registry/magicui/text-animate"
 import { AnimatedShinyText } from "@/registry/magicui/animated-shiny-text"
+import { Terminal, TypingAnimation, AnimatedSpan } from "@/registry/magicui/terminal"
 
 interface HeroProps {
   language: Language
@@ -63,52 +64,31 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             </p>
           </motion.div>
 
-          {/* Right Column: Vertical Technical Specifications List (Strictly Right-Aligned) */}
+          {/* Right Column: Interactive Terminal Graphic (Strictly Right-Aligned) */}
           <motion.div
             key={`metrics-${language}`}
             initial={{ opacity: 0, x: 16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="lg:col-span-5 xl:col-span-4 flex flex-col justify-center space-y-3.5"
+            className="lg:col-span-5 xl:col-span-4 flex flex-col justify-center items-end w-full"
           >
-            {/* Spec 1: Sampling Frequency */}
-            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-primary/40 hover:bg-muted/30 transition-all">
-              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
-                  <Waves className="w-4 h-4" />
-                </div>
-                <span>{t.heroMetric1Label}</span>
-              </div>
-              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
-                {t.heroMetric1Val}
-              </span>
-            </div>
-
-            {/* Spec 2: Min-tDCF Benchmark */}
-            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-emerald-500/40 hover:bg-muted/30 transition-all">
-              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
-                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <span>{t.heroMetric2Label}</span>
-              </div>
-              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
-                {t.heroMetric2Val}
-              </span>
-            </div>
-
-            {/* Spec 3: Model Graph Architecture */}
-            <div className="p-4 rounded-2xl bg-background border border-border flex items-center justify-between gap-4 hover:border-indigo-500/40 hover:bg-muted/30 transition-all">
-              <div className="flex items-center gap-2.5 text-xs text-muted-foreground font-medium">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
-                  <Cpu className="w-4 h-4" />
-                </div>
-                <span>{t.heroMetric3Label}</span>
-              </div>
-              <span className="text-sm sm:text-base font-mono font-bold text-foreground text-right">
-                {t.heroMetric3Val}
-              </span>
-            </div>
+            <Terminal key={`terminal-${language}`} className="w-full">
+              <TypingAnimation className="text-primary font-mono font-bold text-xs sm:text-sm">
+                {language === "th" ? "> เริ่มต้นการทำงานระบบ AASIST core..." : "> initializing AASIST acoustic core..."}
+              </TypingAnimation>
+              <AnimatedSpan delay={150} className="text-xs font-mono text-muted-foreground">
+                <span className="text-foreground font-semibold">✔ [{t.heroMetric1Label}]</span>: {t.heroMetric1Val}
+              </AnimatedSpan>
+              <AnimatedSpan delay={250} className="text-xs font-mono text-muted-foreground">
+                <span className="text-emerald-500 font-semibold">✔ [{t.heroMetric2Label}]</span>: {t.heroMetric2Val}
+              </AnimatedSpan>
+              <AnimatedSpan delay={350} className="text-xs font-mono text-muted-foreground">
+                <span className="text-indigo-400 font-semibold">✔ [{t.heroMetric3Label}]</span>: {t.heroMetric3Val}
+              </AnimatedSpan>
+              <AnimatedSpan delay={450} className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">
+                <span>✔ [status]</span>: {language === "th" ? "โมเดลพร้อมสำหรับการวิเคราะห์" : "AASIST GAT Model Ready"}
+              </AnimatedSpan>
+            </Terminal>
           </motion.div>
         </div>
 
