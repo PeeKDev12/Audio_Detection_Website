@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md shadow-neu-sm dark:shadow-neu-sm-dark transition-all duration-300">
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Left: NECTEC SVG Logo clearly visible */}
@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => scrollToSection("home")}
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            <div className="p-2 rounded-2xl bg-background dark:dark transition-all hover:scale-105">
+            <div className="p-2 rounded-2xl bg-background border border-border/60 transition-all hover:border-primary/40 hover:bg-muted/40">
               <img
                 src="/Logo_of_NECTEC.svg"
                 alt="NECTEC Logo"
@@ -78,36 +78,16 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Center: Desktop Navigation with Scrollspy Active Glow */}
-          <nav className="hidden lg:flex items-center space-x-2 text-xs font-semibold">
-            {navItems.map((item) => {
-              const isActive = activeSection === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`px-4 py-2 rounded-xl transition-colors duration-200 ${
-                    isActive
-                      ? "text-black dark:text-white font-bold"
-                      : "text-foreground/80 hover:text-primary"
-                  }`}
-                >
-                  {item.label}
-                </button> 
-              )
-            })}
-          </nav>
-
           {/* Right: Bilingual Switch & Theme Switch */}
-          <div className="flex items-center gap-3">
-            {/* Bilingual Neumorphic Switch */}
-            <div className="flex items-center p-1 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark text-xs select-none">
+          <div className="flex items-center gap-2.5">
+            {/* Bilingual Flat Switch */}
+            <div className="flex items-center p-1 rounded-xl bg-muted/60 border border-border text-xs select-none">
               <button
                 type="button"
                 onClick={() => setLanguage("en")}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                   language === "en"
-                    ? "bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-primary"
+                    ? "bg-background text-primary border border-border/80"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -116,9 +96,9 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setLanguage("th")}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                   language === "th"
-                    ? "bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-primary"
+                    ? "bg-background text-primary border border-border/80"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -126,10 +106,10 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            {/* Dark/Light Neumorphic Switch */}
+            {/* Dark/Light Flat Switch */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2.5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground hover:text-primary transition-all duration-200"
+              className="p-2.5 rounded-xl bg-background border border-border text-foreground hover:bg-muted hover:text-primary transition-all duration-200"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
@@ -138,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground"
+              className="lg:hidden p-2.5 rounded-xl bg-background border border-border text-foreground hover:bg-muted"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

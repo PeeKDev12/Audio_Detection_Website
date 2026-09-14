@@ -68,7 +68,7 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
           transition={{ duration: 0.4, delay: 0.1 }}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 max-w-4xl mx-auto"
         >
-          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-primary/40 hover:bg-muted/30 transition-all">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
               <Waves className="w-3.5 h-3.5 text-primary" />
               <span>{t.heroMetric1Label}</span>
@@ -78,7 +78,7 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             </span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-emerald-500/40 hover:bg-muted/30 transition-all">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
               <span>{t.heroMetric2Label}</span>
@@ -88,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             </span>
           </div>
 
-          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark flex flex-col items-center justify-center space-y-1">
+          <div className="p-4 rounded-2xl bg-background border border-border flex flex-col items-center justify-center space-y-1 hover:border-indigo-500/40 hover:bg-muted/30 transition-all">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
               <Cpu className="w-3.5 h-3.5 text-indigo-500" />
               <span>{t.heroMetric3Label}</span>
@@ -109,13 +109,13 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
           <button
             type="button"
             onClick={scrollToDetection}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-background text-base sm:text-lg font-bold text-foreground shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark active:scale-[0.98] transition-all duration-200 border border-border/50 hover:cursor-pointer"
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-background text-base sm:text-lg font-bold text-foreground border border-border hover:bg-muted active:scale-[0.98] transition-all duration-200 hover:cursor-pointer"
           >
             <span className="text-primary text-base">✨</span>
             <AnimatedShinyText className="inline-flex items-center justify-center font-extrabold text-foreground transition ease-out">
               <span>{t.heroCta}</span>
             </AnimatedShinyText>
-            <div className="p-1.5 rounded-full bg-primary/10 text-primary shadow-neu-sm dark:shadow-neu-sm-dark group-hover:translate-y-0.5 transition-transform">
+            <div className="p-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:translate-y-0.5 transition-transform">
               <ArrowDown className="w-4 h-4" />
             </div>
           </button>

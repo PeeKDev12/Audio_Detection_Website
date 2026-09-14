@@ -119,7 +119,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
   }
 
   return (
-    <div className="bg-background rounded-2xl p-4 shadow-neu-inset dark:shadow-neu-inset-dark space-y-3">
+    <div className="bg-muted/30 rounded-2xl p-4 border border-border space-y-3">
       {/* Waveform Canvas */}
       <div className="relative">
         <div ref={containerRef} className="w-full rounded-xl overflow-hidden" />
@@ -130,15 +130,15 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
         )}
       </div>
 
-      {/* Neumorphic Mechanical Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40 text-xs sm:text-sm">
+      {/* Flat Mechanical Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/60 text-xs sm:text-sm">
         <div className="flex items-center gap-2">
           {/* Play/Pause */}
           <button
             type="button"
             onClick={togglePlay}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-primary font-bold disabled:opacity-40 transition-all"
+            className="p-2.5 rounded-xl bg-background border border-border text-primary font-bold hover:bg-muted hover:border-primary/40 disabled:opacity-40 transition-all"
             title={isPlaying ? "Pause" : "Play"}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5 fill-current" />}
@@ -149,7 +149,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
             type="button"
             onClick={handleRestart}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground/80 hover:text-foreground disabled:opacity-40 transition-all"
+            className="p-2.5 rounded-xl bg-background border border-border text-foreground/80 hover:text-foreground hover:bg-muted disabled:opacity-40 transition-all"
             title="Restart Track"
           >
             <RotateCcw className="w-4 h-4" />
@@ -160,7 +160,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
             type="button"
             onClick={toggleMute}
             disabled={!isLoaded}
-            className="p-2.5 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-foreground/80 hover:text-foreground disabled:opacity-40 transition-all"
+            className="p-2.5 rounded-xl bg-background border border-border text-foreground/80 hover:text-foreground hover:bg-muted disabled:opacity-40 transition-all"
             title="Toggle Mute"
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-rose-500" /> : <Volume2 className="w-4 h-4" />}
@@ -171,7 +171,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
             type="button"
             onClick={cyclePlaybackRate}
             disabled={!isLoaded}
-            className="px-3 py-2 rounded-xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark active:shadow-neu-pressed dark:active:shadow-neu-pressed-dark text-primary font-mono text-xs disabled:opacity-40 transition-all flex items-center gap-1"
+            className="px-3 py-2 rounded-xl bg-background border border-border text-primary font-mono text-xs hover:bg-muted disabled:opacity-40 transition-all flex items-center gap-1"
           >
             <FastForward className="w-3 h-3" />
             <span>{playbackRate}x</span>
@@ -179,7 +179,7 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
         </div>
 
         {/* Timestamp */}
-        <div className="font-mono text-xs px-3 py-1.5 rounded-xl bg-background shadow-neu-sm dark:shadow-neu-sm-dark">
+        <div className="font-mono text-xs px-3 py-1.5 rounded-xl bg-background border border-border">
           <span className="text-primary font-bold">{formatTime(currentTime)}</span>
           <span className="text-muted-foreground"> / {formatTime(duration)}</span>
         </div>

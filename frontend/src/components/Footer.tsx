@@ -10,9 +10,9 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
   const t = translations[language]
 
   return (
-    <footer className="mt-20 border-t border-border/40 bg-background/80 shadow-neu-sm dark:shadow-neu-sm-dark py-12">
+    <footer className="mt-20 border-t border-border bg-background py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-border/40">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-8 border-b border-border/60">
           {/* Col 1 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
           {/* Col 2 */}
           <div className="space-y-2 text-xs text-muted-foreground">
             <h4 className="font-bold text-foreground text-sm mb-2">{t.footerCol2Title}</h4>
-            <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark">
+            <div className="p-4 rounded-2xl bg-muted/40 border border-border">
               <p className="font-bold text-foreground">
                 {t.footerCredits}
               </p>

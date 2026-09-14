@@ -70,7 +70,7 @@ export const FauxProgressBar: React.FC<FauxProgressBarProps> = ({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -8 }}
-        className="rounded-3xl p-6 bg-background shadow-neu-flat dark:shadow-neu-flat-dark my-6 space-y-4"
+        className="rounded-3xl p-6 bg-background border border-border my-6 space-y-4"
       >
         <div className="flex items-center justify-between text-xs sm:text-sm font-semibold">
           <div className="flex items-center gap-2 text-foreground">
@@ -82,8 +82,8 @@ export const FauxProgressBar: React.FC<FauxProgressBarProps> = ({
           </span>
         </div>
 
-        {/* Neumorphic Inset Progress Track */}
-        <div className="w-full h-3.5 rounded-full bg-background shadow-neu-inset dark:shadow-neu-inset-dark overflow-hidden p-0.5">
+        {/* Flat Progress Track */}
+        <div className="w-full h-3 rounded-full bg-muted/60 border border-border/80 overflow-hidden">
           <motion.div
             className="h-full rounded-full bg-primary"
             initial={{ width: "0%" }}

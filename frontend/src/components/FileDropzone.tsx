@@ -74,16 +74,16 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Neumorphic Drop Area */}
+      {/* Flat Bordered Drop Area */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`group relative rounded-3xl p-8 sm:p-10 text-center cursor-pointer transition-all duration-300 ${
+        className={`group relative rounded-3xl p-8 sm:p-10 text-center cursor-pointer transition-all duration-300 border-2 border-dashed ${
           isDragOver
-            ? "shadow-neu-inset dark:shadow-neu-inset-dark ring-2 ring-primary scale-[0.99]"
-            : "bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-sm dark:hover:shadow-neu-sm-dark"
+            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+            : "border-border bg-background hover:border-primary/50 hover:bg-muted/30"
         }`}
       >
         <input
@@ -96,7 +96,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
         />
 
         <div className="flex flex-col items-center justify-center space-y-3">
-          <div className="p-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark group-hover:shadow-neu-inset dark:group-hover:shadow-neu-inset-dark text-primary transition-all duration-200">
+          <div className="p-4 rounded-2xl bg-muted/60 border border-border group-hover:border-primary/40 group-hover:bg-primary/10 text-primary transition-all duration-200">
             <UploadCloud className="w-8 h-8" />
           </div>
           <div>
@@ -114,8 +114,8 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
       </div>
 
       {/* Waveform Inspection Monitor */}
-      <div className="rounded-3xl p-6 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-border/40">
+      <div className="rounded-3xl p-6 bg-background border border-border space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-border/60">
           <div className="flex items-center gap-2">
             <Waves className="w-4 h-4 text-primary" />
             <h4 className="text-sm font-bold text-foreground">
@@ -133,7 +133,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
           {selectedPreviewFile ? (
             <AudioWaveform file={selectedPreviewFile} height={75} />
           ) : (
-            <div className="py-10 text-center text-xs text-muted-foreground bg-background rounded-2xl shadow-neu-inset dark:shadow-neu-inset-dark p-6">
+            <div className="py-10 text-center text-xs text-muted-foreground bg-muted/30 border border-border/60 rounded-2xl p-6">
               {t.noFileSelected}
             </div>
           )}
@@ -142,7 +142,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
 
       {/* Ingestion Queue Card */}
       {files.length > 0 && (
-        <div className="rounded-3xl p-6 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4 animate-in fade-in duration-200">
+        <div className="rounded-3xl p-6 bg-background border border-border space-y-4 animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <FileAudio className="w-4 h-4 text-primary" />
@@ -166,10 +166,10 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
               return (
                 <div
                   key={`${file.name}-${idx}`}
-                  className={`flex items-center justify-between p-3 rounded-2xl transition-all select-none ${
+                  className={`flex items-center justify-between p-3 rounded-2xl transition-all select-none border ${
                     isSelected
-                      ? "shadow-neu-inset dark:shadow-neu-inset-dark ring-1 ring-primary/40 bg-secondary/20"
-                      : "shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark bg-background"
+                      ? "border-primary/50 bg-primary/10 text-foreground"
+                      : "border-border/60 bg-muted/30 hover:border-border hover:bg-muted/60"
                   }`}
                 >
                   <div
@@ -196,7 +196,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
                       onFileRemoved(idx)
                     }}
                     disabled={isAnalyzing}
-                    className="p-1.5 rounded-xl text-muted-foreground hover:text-rose-500 shadow-neu-sm dark:shadow-neu-sm-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark transition-all ml-2"
+                    className="p-1.5 rounded-xl text-muted-foreground hover:text-rose-500 border border-border/40 hover:border-rose-500/30 hover:bg-rose-500/10 transition-all ml-2"
                     title="Remove file"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -212,7 +212,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
               type="button"
               onClick={onRunClick}
               disabled={isAnalyzing || files.length === 0}
-              className="w-full py-4 px-6 rounded-2xl bg-background text-primary font-bold text-sm sm:text-base shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 border border-border/40"
+              className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-sm sm:text-base hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 border border-primary/30 active:scale-[0.99]"
             >
               <span>{isAnalyzing ? t.runningButton : `${t.runButton} (${files.length})`}</span>
               <ArrowRight className="w-4 h-4" />

@@ -8,7 +8,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Kanit', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        thai: ['Kanit', 'Sarabun', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
@@ -45,21 +46,7 @@ export default {
         lg: "0.5rem",
         md: "0.375rem",
       },
-      boxShadow: {
-        // Light mode Neumorphism (#e0e5ec base)
-        "neu-flat": "6px 6px 14px #b8bec7, -6px -6px 14px #ffffff",
-        "neu-sm": "3px 3px 6px #b8bec7, -3px -3px 6px #ffffff",
-        "neu-lg": "10px 10px 22px #b0b7c2, -10px -10px 22px #ffffff",
-        "neu-inset": "inset 3px 3px 6px #b8bec7, inset -3px -3px 6px #ffffff",
-        "neu-pressed": "inset 4px 4px 8px #b0b7c2, inset -4px -4px 8px #ffffff",
-
-        // Dark mode Neumorphism (#1a1f28 base)
-        "neu-flat-dark": "6px 6px 14px #12161e, -6px -6px 14px #242c3b",
-        "neu-sm-dark": "3px 3px 6px #12161e, -3px -3px 6px #242c3b",
-        "neu-lg-dark": "10px 10px 22px #0f1219, -10px -10px 22px #263040",
-        "neu-inset-dark": "inset 3px 3px 6px #12161e, inset -3px -3px 6px #242c3b",
-        "neu-pressed-dark": "inset 4px 4px 8px #0f1219, inset -4px -4px 8px #263040",
-      },
+      boxShadow: {},
       animation: {
         "shiny-text": "shiny-text 8s infinite",
       },

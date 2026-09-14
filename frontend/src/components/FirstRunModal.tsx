@@ -27,11 +27,11 @@ export const FirstRunModal: React.FC<FirstRunModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.92, y: 15 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative max-w-lg w-full bg-background rounded-3xl p-6 sm:p-8 shadow-neu-lg dark:shadow-neu-lg-dark border border-border/40 space-y-6"
+          className="relative max-w-lg w-full bg-background rounded-3xl p-6 sm:p-8 border border-border space-y-6"
         >
           {/* Header */}
           <div className="flex items-center gap-3.5">
-            <div className="p-3 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-primary">
+            <div className="p-3 rounded-2xl bg-muted/60 border border-border text-primary">
               <Info className="w-5 h-5" />
             </div>
             <div>
@@ -45,7 +45,7 @@ export const FirstRunModal: React.FC<FirstRunModalProps> = ({
           </div>
 
           {/* Notice Body */}
-          <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark space-y-2 text-xs sm:text-sm text-foreground/90 leading-relaxed">
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-2 text-xs sm:text-sm text-foreground/90 leading-relaxed">
             <div className="font-semibold text-primary">
               {t.modalNoticeHeader}
             </div>
@@ -59,7 +59,7 @@ export const FirstRunModal: React.FC<FirstRunModalProps> = ({
             <button
               type="button"
               onClick={onExploreModels}
-              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background border border-border hover:bg-muted text-xs font-bold text-foreground transition-all flex items-center justify-center gap-2"
             >
               <ArrowDown className="w-4 h-4 text-muted-foreground" />
               <span>{t.modalExplore}</span>
@@ -68,7 +68,7 @@ export const FirstRunModal: React.FC<FirstRunModalProps> = ({
             <button
               type="button"
               onClick={onConfirmAndRun}
-              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark text-xs font-bold text-primary transition-all flex items-center justify-center gap-2 border border-primary/30"
+              className="w-full sm:w-1/2 py-3 px-4 rounded-2xl bg-primary hover:bg-primary/90 text-xs font-bold text-primary-foreground transition-all flex items-center justify-center gap-2 border border-primary/30"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>{t.modalConfirm}</span>

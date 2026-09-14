@@ -20,7 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo & Title */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab("detector")}>
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 shadow-lg shadow-cyan-500/20 text-white">
+            <div className="p-2 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-600 text-white">
               <ShieldAlert className="w-6 h-6" />
             </div>
             <div>
@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab("detector")}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === "detector"
-                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner"
+                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
             >
@@ -54,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab("history")}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === "history"
-                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner"
+                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
             >
@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab("models")}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 activeTab === "models"
-                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-inner"
+                  ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
               }`}
             >

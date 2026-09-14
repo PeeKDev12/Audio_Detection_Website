@@ -24,9 +24,9 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
       {/* Model Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ResNet34 Monograph */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
+        <div className="rounded-3xl p-6 sm:p-8 bg-background border border-border space-y-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-primary">
+            <div className="p-3 rounded-2xl bg-muted/60 border border-border text-primary">
               <Layers className="w-6 h-6" />
             </div>
             <div>
@@ -52,9 +52,9 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
         </div>
 
         {/* AASIST Monograph */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
+        <div className="rounded-3xl p-6 sm:p-8 bg-background border border-border space-y-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark text-indigo-500">
+            <div className="p-3 rounded-2xl bg-muted/60 border border-border text-indigo-500">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -81,21 +81,21 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
       </div>
 
       {/* Feature Extractors */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-background shadow-neu-flat dark:shadow-neu-flat-dark space-y-4">
+      <div className="rounded-3xl p-6 sm:p-8 bg-background border border-border space-y-4">
         <h3 className="text-base font-bold text-foreground flex items-center gap-2">
           <Waves className="w-5 h-5 text-primary" />
           <span>Acoustic Feature Extraction Engineering</span>
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-          <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark space-y-1.5">
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-1.5">
             <h4 className="font-bold text-sm text-primary">{t.lfccTitle}</h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t.lfccDesc}
             </p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-background shadow-neu-inset dark:shadow-neu-inset-dark space-y-1.5">
+          <div className="p-4 rounded-2xl bg-muted/30 border border-border space-y-1.5">
             <h4 className="font-bold text-sm text-indigo-500">{t.mfccTitle}</h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t.mfccDesc}
@@ -110,7 +110,7 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
           href="https://github.com/clovaai/aasist"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-background shadow-neu-flat dark:shadow-neu-flat-dark hover:shadow-neu-inset dark:hover:shadow-neu-inset-dark text-xs font-semibold text-foreground hover:text-primary transition-all duration-200 border border-border/40"
+          className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-2xl bg-background border border-border hover:bg-muted text-xs font-semibold text-foreground hover:text-primary transition-all duration-200"
         >
           <svg className="w-4 h-4 fill-current text-foreground" viewBox="0 0 24 24">
             <path
