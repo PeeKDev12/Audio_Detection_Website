@@ -60,6 +60,19 @@ export default {
         "neu-inset-dark": "inset 3px 3px 6px #12161e, inset -3px -3px 6px #242c3b",
         "neu-pressed-dark": "inset 4px 4px 8px #0f1219, inset -4px -4px 8px #263040",
       },
+      animation: {
+        "shiny-text": "shiny-text 8s infinite",
+      },
+      keyframes: {
+        "shiny-text": {
+          "0%, 90%, 100%": {
+            "background-position": "calc(-100% - var(--shiny-width, 100px)) 0",
+          },
+          "30%, 60%": {
+            "background-position": "calc(100% + var(--shiny-width, 100px)) 0",
+          },
+        },
+      },
     },
   },
   plugins: [],

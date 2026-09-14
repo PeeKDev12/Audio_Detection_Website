@@ -9,6 +9,7 @@ import { HistoryView } from "./components/HistoryView"
 import { ModelsGuide } from "./components/ModelsGuide"
 import { Footer } from "./components/Footer"
 import { FirstRunModal } from "./components/FirstRunModal"
+import { SmoothCursor } from "./components/SmoothCursor"
 import { apiService } from "./services/api"
 import type { PredictionResult } from "./types"
 import { type Language, translations } from "./lib/i18n"
@@ -189,6 +190,9 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans antialiased selection:bg-primary/20 selection:text-primary">
+      {/* Magic UI Smooth Cursor */}
+      <SmoothCursor />
+
       {/* First Run Interception Modal */}
       <FirstRunModal
         isOpen={isFirstRunModalOpen}

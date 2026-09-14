@@ -2,6 +2,8 @@ import React from "react"
 import { motion } from "framer-motion"
 import { ArrowDown, ShieldCheck, Waves, Cpu } from "lucide-react"
 import { type Language, translations } from "../lib/i18n"
+import { TextAnimate } from "@/registry/magicui/text-animate"
+import { AnimatedShinyText } from "@/registry/magicui/animated-shiny-text"
 
 interface HeroProps {
   language: Language
@@ -27,9 +29,31 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
           className="space-y-4"
         >
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-tight">
-            <span>{t.heroTitleLine1} </span>
-            <span className="text-primary">{t.heroTitleLine2} </span>
-            <span>{t.heroTitleLine3}</span>
+            {t.heroTitleLine1 && (
+              <>
+                <TextAnimate animation="blurInUp" by="character" once as="span">
+                  {t.heroTitleLine1}
+                </TextAnimate>{" "}
+              </>
+            )}
+            {t.heroTitleLine2 && (
+              <>
+                <TextAnimate
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  as="span"
+                  className="text-primary"
+                >
+                  {t.heroTitleLine2}
+                </TextAnimate>{" "}
+              </>
+            )}
+            {t.heroTitleLine3 && (
+              <TextAnimate animation="blurInUp" by="character" once as="span">
+                {t.heroTitleLine3}
+              </TextAnimate>
+            )}
           </h1>
           <p className="max-w-3xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed pt-1">
             {t.heroDescription}
@@ -80,14 +104,17 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
-          className="pt-2"
+          className="pt-2 flex justify-center"
         >
           <button
             type="button"
             onClick={scrollToDetection}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-3xl bg-background text-base sm:text-lg font-bold text-foreground shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark active:scale-[0.98] transition-all duration-200 border border-border/40"
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-background text-base sm:text-lg font-bold text-foreground shadow-neu-lg dark:shadow-neu-lg-dark hover:shadow-neu-pressed dark:hover:shadow-neu-pressed-dark active:scale-[0.98] transition-all duration-200 border border-border/50 hover:cursor-pointer"
           >
-            <span className="text-primary font-extrabold">{t.heroCta}</span>
+            <span className="text-primary text-base">✨</span>
+            <AnimatedShinyText className="inline-flex items-center justify-center font-extrabold text-foreground transition ease-out">
+              <span>{t.heroCta}</span>
+            </AnimatedShinyText>
             <div className="p-1.5 rounded-full bg-primary/10 text-primary shadow-neu-sm dark:shadow-neu-sm-dark group-hover:translate-y-0.5 transition-transform">
               <ArrowDown className="w-4 h-4" />
             </div>
