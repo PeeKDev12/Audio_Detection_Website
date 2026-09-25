@@ -88,11 +88,43 @@ class InferenceService:
             else:
                 logger.warning(f"⚠️ Model file not found for {key}: {path_str}")
 
+        # 3. AASIST PyTorch Graph Attention Network Model
+        try:
+            import torch
+            from services.aasist_arch import Model as AASISTModel
+
+            aasist_path = str(settings.MODEL_AASIST_PATH)
+            if os.path.exists(aasist_path):
+                try:
+                    d_args = {
+                        "first_conv": 128,
+                        "filts": [70, [1, 32], [32, 32], [32, 64], [64, 64]],
+                        "gat_dims": [64, 32],
+                        "pool_ratios": [0.5, 0.7, 0.5],
+                        "temperatures": [2.0, 2.0, 100.0],
+                    }
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    self.torch_device = device
+                    m_aasist = AASISTModel(d_args)
+                    state_dict = torch.load(aasist_path, map_location=device)
+                    m_aasist.load_state_dict(state_dict)
+                    m_aasist.to(device)
+                    m_aasist.eval()
+                    self.models["AASIST"] = m_aasist
+                    logger.info(f"✅ AASIST PyTorch Model loaded: {aasist_path} on {device}")
+                except Exception as e:
+                    logger.error(f"❌ Failed loading AASIST weights: {e}")
+            else:
+                logger.warning(f"⚠️ AASIST model file not found: {aasist_path}")
+        except Exception as e:
+            logger.warning(f"⚠️ AASIST loading error: {e}")
+
         self._initialized = True
 
     def get_model_specs(self, model_key: str) -> Tuple[str, str, int]:
         """Returns (feature_mode, label_prefix, prefer_feature_bins)."""
         specs = {
+            "AASIST": ("raw_waveform", "AASIST", 64600),
             "PA": ("lfcc_v1", "PA", 57),
             "LA": ("lfcc_v1", "LA", 57),
             "LFCC_MMS": ("lfcc_v2", "LFCC_MMS", 57),
@@ -123,6 +155,39 @@ class InferenceService:
 
         mode, label_prefix, prefer_bins = self.get_model_specs(model_key)
 
+        # ---------------- Specialized Branch for PyTorch AASIST Raw Waveform ----------------
+        if model_key == "AASIST":
+            try:
+                import torch
+                from services.audio_processor import process_raw_audio_for_aasist
+
+                waveform = process_raw_audio_for_aasist(
+                    file_bytes, target_sr=16000, target_length=64600
+                )
+                device = getattr(self, "torch_device", "cuda" if torch.cuda.is_available() else "cpu")
+                tensor_in = waveform.unsqueeze(0).to(device)  # (1, 64600)
+
+                with torch.no_grad():
+                    _, out_logits = model(tensor_in)
+                    probs = torch.softmax(out_logits, dim=-1).cpu().numpy()[0]
+
+                idx = int(np.argmax(probs))
+                label = class_order[idx]
+                conf_prob = float(probs[idx])
+                conf_pct = conf_prob * 100.0
+
+                return {
+                    "filename": filename,
+                    "model": label_prefix,
+                    "label": label,
+                    "confidence": conf_prob,
+                    "confidence_pct": round(conf_pct, 2),
+                }
+            except Exception as e:
+                logger.exception(f"AASIST prediction failed for {filename}: {e}")
+                return {"filename": filename, "error": f"AASIST prediction error: {str(e)}"}
+
+        # ---------------- Standard Branch for Keras / ResNet Models ----------------
         # Temporary save uploaded bytes for robust multi-format decoding
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
             tmp.write(file_bytes)
@@ -223,15 +288,18 @@ class InferenceService:
 
     def get_models_status(self) -> Dict[str, Dict[str, Any]]:
         """Returns the operational status and input shape of all managed models."""
-        keys = ["PA", "LA", "LFCC_MMS", "MFCC_MMS", "LFCC_VAJA", "MFCC_VAJA", "LFCC"]
+        keys = ["AASIST", "PA", "LA", "LFCC_MMS", "MFCC_MMS", "LFCC_VAJA", "MFCC_VAJA", "LFCC"]
         status = {}
         for key in keys:
             m = self.models.get(key)
             if m is None:
                 status[key] = {"name": key, "loaded": False}
             else:
-                shape = getattr(m, "input_shape", None)
-                status[key] = {"name": key, "loaded": True, "input_shape": shape}
+                if key == "AASIST":
+                    status[key] = {"name": key, "loaded": True, "input_shape": [1, 64600]}
+                else:
+                    shape = getattr(m, "input_shape", None)
+                    status[key] = {"name": key, "loaded": True, "input_shape": shape}
         return status
 
 

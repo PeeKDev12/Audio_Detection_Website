@@ -5,6 +5,22 @@ import { type Language, translations } from "../lib/i18n"
 
 export const ALL_MODELS: ModelInfo[] = [
   {
+    id: "AASIST",
+    name: "AASIST (Original Clova AI)",
+    endpoint: "/predict_aasist",
+    featureExtractor: "Raw SincConv",
+    architecture: "Spectro-Temporal GAT",
+    description: "Official Clova AI Graph Attention Network operating directly on raw 16 kHz waveforms.",
+    inputShape: "(1, 64600)",
+    badge: "Original AASIST",
+    color: "violet",
+    metrics: {
+      eer: "0.83%",
+      f1: "99.45%",
+      accuracy: "99.58%",
+    },
+  },
+  {
     id: "LFCC_VAJA",
     name: "LFCC-VAJA+Genuine",
     endpoint: "/predict_lfcc_vaja",

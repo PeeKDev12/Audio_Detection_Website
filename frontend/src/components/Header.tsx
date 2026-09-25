@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => scrollToSection("home")}
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            <div className="p-2 rounded-2xl bg-background border border-border/60 transition-all hover:border-primary/40 hover:bg-muted/40">
+            <div className="">
               <img
                 src="/Logo_of_NECTEC.svg"
                 alt="NECTEC Logo"

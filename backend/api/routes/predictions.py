@@ -12,6 +12,16 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["Predictions"])
 
 
+@router.post("/predict_aasist")
+async def predict_aasist(
+    files: List[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+    service: InferenceService = Depends(get_inference_svc),
+):
+    logger.info(f"/predict_aasist called with {len(files)} file(s)")
+    return await service.predict_batch(files, "AASIST", db)
+
+
 @router.post("/predict_pa")
 async def predict_pa(
     files: List[UploadFile] = File(...),

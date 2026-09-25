@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
 
     # Model Weights Paths
+    MODEL_AASIST_PATH: Path = ML_WEIGHTS_DIR / "AASIST.pth"
     MODEL_PA_PATH: Path = ML_WEIGHTS_DIR / "PA.h5"
     MODEL_LA_PATH: Path = ML_WEIGHTS_DIR / "LA.h5"
     MODEL_LFCC_MMS_PATH: Path = ML_WEIGHTS_DIR / "LFCC_genuine_MMS.h5"

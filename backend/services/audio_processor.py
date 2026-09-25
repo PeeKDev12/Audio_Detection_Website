@@ -1,6 +1,8 @@
 import io
+import os
 import logging
 import subprocess
+import tempfile
 import numpy as np
 import soundfile as sf
 import torch
@@ -57,26 +59,59 @@ def read_audio(path: str) -> Tuple[Optional[np.ndarray], Optional[int]]:
 def process_raw_audio_for_aasist(
     audio_source: Union[str, bytes, io.BytesIO],
     target_sr: int = 16000,
-    target_length: Optional[int] = None,
+    target_length: Optional[int] = 64600,
 ) -> torch.Tensor:
     """
     Preprocess raw audio strictly for AASIST and raw waveform deepfake detectors.
     - Decodes audio to mono waveform
     - Strictly resamples to target_sr (16,000 Hz)
-    - Returns a 1D PyTorch float32 tensor (num_samples,) without extracting spectrogram/LFCC/MFCC
+    - Pads or slices to target_length (default 64,600 samples)
+    - Returns a 1D PyTorch float32 tensor (num_samples,)
     """
+    data: Optional[np.ndarray] = None
+    sr: Optional[int] = None
+
     if isinstance(audio_source, (bytes, bytearray)):
-        buf = io.BytesIO(audio_source)
-        data, sr = sf.read(buf)
+        try:
+            buf = io.BytesIO(audio_source)
+            data, sr = sf.read(buf)
+        except Exception:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".audio") as tmp:
+                tmp.write(audio_source)
+                tmp_path = tmp.name
+            try:
+                data, sr = read_audio(tmp_path)
+            finally:
+                try:
+                    os.unlink(tmp_path)
+                except Exception:
+                    pass
+
     elif isinstance(audio_source, io.BytesIO):
-        audio_source.seek(0)
-        data, sr = sf.read(audio_source)
+        try:
+            audio_source.seek(0)
+            data, sr = sf.read(audio_source)
+        except Exception:
+            audio_source.seek(0)
+            raw_b = audio_source.read()
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".audio") as tmp:
+                tmp.write(raw_b)
+                tmp_path = tmp.name
+            try:
+                data, sr = read_audio(tmp_path)
+            finally:
+                try:
+                    os.unlink(tmp_path)
+                except Exception:
+                    pass
+
     elif isinstance(audio_source, str):
         data, sr = read_audio(audio_source)
-        if data is None or sr is None:
-            raise ValueError(f"Could not read audio from path: {audio_source}")
     else:
         raise TypeError(f"Unsupported audio source type: {type(audio_source)}")
+
+    if data is None or sr is None:
+        raise ValueError("Could not decode audio waveform from source")
 
     if data.ndim > 1:
         data = np.mean(data, axis=1)

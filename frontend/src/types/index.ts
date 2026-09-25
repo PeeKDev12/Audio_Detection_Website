@@ -17,7 +17,7 @@ export interface ModelInfo {
   id: string
   name: string
   endpoint: string
-  featureExtractor: "LFCC" | "MFCC" | "Raw Waveform"
+  featureExtractor: "Raw SincConv" | "Raw Waveform" | "LFCC" | "MFCC" | string
   architecture: string
   description: string
   badge?: string
