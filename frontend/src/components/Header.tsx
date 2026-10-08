@@ -24,7 +24,12 @@ export const Header: React.FC<HeaderProps> = ({
     const sectionIds = ["home", "detection", "history", "models-guide"]
     
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 200
+      if (window.scrollY < 200) {
+        setActiveSection("home")
+        return
+      }
+
+      const scrollPosition = window.scrollY + 220
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {
         const id = sectionIds[i]
@@ -47,6 +52,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false)
+    if (id === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+      return
+    }
     const element = document.getElementById(id)
     if (element) {
       element.scrollIntoView({ behavior: "smooth" })
@@ -71,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="">
               <img
-                src="/Logo_of_NECTEC.svg"
+                src="./Logo_of_NECTEC.svg"
                 alt="NECTEC Logo"
                 className="h-10 w-auto object-contain"
               />
