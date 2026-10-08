@@ -1,7 +1,6 @@
 # ==========================================
-# Python & Backend
+# 1. Python, Virtual Environments & Backend
 # ==========================================
-# Virtual environments
 venv*/
 .venv*/
 env*/
@@ -9,8 +8,9 @@ env*/
 backend/venv*/
 backend/.venv*/
 
-# Byte-compiled / optimized / cache files
+# Bytecode, cache, and test artifacts
 __pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -25,7 +25,7 @@ htmlcov/
 *.pem
 *.key
 
-# SQLite Databases & logs
+# SQLite Databases & runtime logs
 *.db
 *.sqlite
 *.sqlite3
@@ -33,7 +33,10 @@ asv_project.db
 backend/asv_project.db
 *.log
 
-# Large Machine Learning Models & Checkpoints (>100MB cannot be pushed to GitHub without Git LFS)
+# ==========================================
+# 2. Machine Learning Weights & Model Checkpoints
+# ==========================================
+# Binary model weights (>100MB cannot be pushed to GitHub without Git LFS)
 *.h5
 *.hdf5
 *.pth
@@ -42,39 +45,73 @@ backend/asv_project.db
 *.pkl
 *.pickle
 *.ckpt
-backend/models/*.h5
+ml_weights/
+*/ml_weights/
+backend/ml_weights/
+asv_evaluator_bundle/ml_weights/
 
-# Generated protocol outputs & evaluation reports
-backend/protocol_*_outputs/
+# ==========================================
+# 3. Audio Datasets & Sample Files
+# ==========================================
+SLSCU CSS main data_samples/
+*/SLSCU CSS main data_samples/
+evaluation/SLSCU CSS main data_samples/
+flac_E_aa/
+*/flac_E_aa/
+evaluation/flac_E_aa/
+data/
+*/data/
+datasets/
+*/datasets/
+
+# Raw audio files (prevent accidental large audio pushes)
+*.flac
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.aac
+
+# ==========================================
+# 4. Evaluation Outputs & Benchmark Reports
+# ==========================================
+eval_output/
+*/eval_output/
+evaluation/eval_output/
 protocol_*_outputs/
-*.pdf
-*.xlsx
+backend/protocol_*_outputs/
 
 # ==========================================
-# Frontend (Angular & Node.js)
+# 5. Compressed Archives & Distribution Bundles
 # ==========================================
-# Node modules
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+asv_evaluator_bundle/
+asv_evaluator/
+
+# ==========================================
+# 6. Frontend (React, Vite, Node.js)
+# ==========================================
 node_modules/
 */node_modules/
-
-# Compiled output & builds
 dist/
 */dist/
+.vite/
+*/.vite/
 tmp/
 */tmp/
 out-tsc/
-bazel-out/
 
-# Angular cache & logs
-.angular/
-*/.angular/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
 # ==========================================
-# IDEs & System Files
+# 7. IDEs & Operating System Artifacts
 # ==========================================
 .vscode/*
 !.vscode/settings.json

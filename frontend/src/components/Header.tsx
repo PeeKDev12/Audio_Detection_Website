@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => scrollToSection(item.id)}
                   className={`px-3.5 py-2 rounded-xl transition-all duration-200 ${
                     isActive
-                      ? "text-primary font-bold bg-primary/10 border border-primary/20"
+                      ? "text-primary font-bold bg-primary/10"
                       : "text-foreground/80 hover:text-foreground hover:bg-muted"
                   }`}
                 >
@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Right: Bilingual Switch & Theme Switch */}
           <div className="flex items-center gap-2.5">
             {/* Bilingual Flat Switch */}
-            <div className="flex items-center p-1 rounded-xl bg-muted/60 border border-border text-xs select-none">
+            <div className="flex items-center p-1 rounded-xl bg-muted/60 text-xs select-none">
               <button
                 type="button"
                 onClick={() => setLanguage("en")}
@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Dark/Light Flat Switch */}
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2.5 rounded-xl bg-background border border-border text-foreground hover:bg-muted hover:text-primary transition-all duration-200"
+              className="p-2.5 rounded-xl bg-background text-foreground hover:bg-muted hover:text-primary transition-all duration-200"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
@@ -138,7 +138,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-background border border-border text-foreground hover:bg-muted"
+              className="lg:hidden p-2.5 rounded-xl bg-background text-foreground hover:bg-muted"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

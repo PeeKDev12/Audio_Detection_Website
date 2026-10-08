@@ -24,7 +24,7 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
       {/* Model Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ResNet34 Monograph */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-background border border-border space-y-4">
+        <div className="rounded-3xl p-6 sm:p-8 bg-background space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-muted/60 border border-border text-primary">
               <Layers className="w-6 h-6" />
@@ -52,7 +52,7 @@ export const ModelsGuide: React.FC<ModelsGuideProps> = ({ language }) => {
         </div>
 
         {/* AASIST Monograph */}
-        <div className="rounded-3xl p-6 sm:p-8 bg-background border border-border space-y-4">
+        <div className="rounded-3xl p-6 sm:p-8 bg-background space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-muted/60 border border-border text-indigo-500">
               <Sparkles className="w-6 h-6" />

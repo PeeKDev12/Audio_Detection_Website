@@ -100,8 +100,8 @@ class InferenceService:
                         "first_conv": 128,
                         "filts": [70, [1, 32], [32, 32], [32, 64], [64, 64]],
                         "gat_dims": [64, 32],
-                        "pool_ratios": [0.5, 0.7, 0.5],
-                        "temperatures": [2.0, 2.0, 100.0],
+                        "pool_ratios": [0.5, 0.7, 0.5, 0.5],
+                        "temperatures": [2.0, 2.0, 100.0, 100.0],
                     }
                     device = "cuda" if torch.cuda.is_available() else "cpu"
                     self.torch_device = device
@@ -148,6 +148,9 @@ class InferenceService:
         if not self._initialized:
             self.load_models()
 
+        if not file_bytes or len(file_bytes) == 0:
+            return {"filename": filename, "error": "Uploaded audio file is empty (0 bytes)"}
+
         model = self.models.get(model_key)
         if model is None:
             logger.error(f"Model '{model_key}' is not loaded")
@@ -188,16 +191,21 @@ class InferenceService:
                 return {"filename": filename, "error": f"AASIST prediction error: {str(e)}"}
 
         # ---------------- Standard Branch for Keras / ResNet Models ----------------
-        # Temporary save uploaded bytes for robust multi-format decoding
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
+        # Temporary save uploaded bytes with original extension for robust multi-format decoding
+        ext = os.path.splitext(filename)[1].lower()
+        if not ext or len(ext) > 6:
+            ext = ".wav"
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
             tmp.write(file_bytes)
+            tmp.flush()
             tmp_path = tmp.name
 
         try:
             # Step 1: Read audio
             signal, sr = read_audio(tmp_path)
             if signal is None or sr is None:
-                return {"filename": filename, "error": "Failed to read audio file"}
+                return {"filename": filename, "error": "Failed to read or decode audio file"}
 
             # Step 2: Feature extraction
             feats = extract_features(signal, sr, mode=mode)
@@ -243,6 +251,7 @@ class InferenceService:
     ) -> Dict[str, Any]:
         """Asynchronously process an uploaded audio file without blocking main event loop."""
         try:
+            await file.seek(0)
             file_bytes = await file.read()
         except Exception as e:
             logger.error(f"Failed reading stream for {file.filename}: {e}")

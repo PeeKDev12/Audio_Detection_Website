@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,10 +41,11 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS Middleware configuration
+# CORS Middleware configuration (Supports localhost, 127.0.0.1, and all LAN/Wi-Fi IPs)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.get_allowed_origins(),
+    allow_origin_regex=r"^https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

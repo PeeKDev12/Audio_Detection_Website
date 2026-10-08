@@ -20,7 +20,7 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
   }
 
   return (
-    <section id="home" className="pt-8 pb-12 md:pt-14 md:pb-16 scroll-mt-24">
+    <section id="home" className="py-4 md:py-6 scroll-mt-24 w-full">
       <div className="w-full max-w-7xl mx-auto space-y-12">
         {/* 2-Column Wide Viewport Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">

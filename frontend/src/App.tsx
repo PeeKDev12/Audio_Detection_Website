@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 import { Header } from "./components/Header"
 import { Hero } from "./components/Hero"
 import { ModelSelector, ALL_MODELS } from "./components/ModelSelector"
@@ -27,8 +28,9 @@ export function App() {
   // Model selection: Default is ONLY LFCC_VAJA (LFCC-VAJA+Genuine)
   const [selectedModelIds, setSelectedModelIds] = useState<string[]>(["LFCC_VAJA"])
   
-  // Audio files queue & waveform selection
+  // Audio files queue, multi-selection & waveform selection
   const [files, setFiles] = useState<File[]>([])
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [selectedPreviewFile, setSelectedPreviewFile] = useState<File | null>(null)
   
   // Analysis & Progress States
@@ -46,6 +48,12 @@ export function App() {
   const [backendOnline, setBackendOnline] = useState(true)
   const [isOfflineModalOpen, setIsOfflineModalOpen] = useState(false)
   const hasShownInitialOfflineAlertRef = useRef(false)
+
+  // Scroll-driven parallax for the fixed/sticky Hero stage
+  const { scrollY } = useScroll()
+  const heroOpacity = useTransform(scrollY, [0, 350, 650], [1, 0.85, 0.15])
+  const heroScale = useTransform(scrollY, [0, 650], [1, 0.92])
+  const heroY = useTransform(scrollY, [0, 650], [0, 70])
 
   // Apply dark mode class to HTML element
   useEffect(() => {
@@ -106,8 +114,34 @@ export function App() {
   // File Queue Handlers
   const handleFilesAdded = (newFiles: File[]) => {
     setFiles((prev) => [...prev, ...newFiles])
-    if (!selectedPreviewFile && newFiles.length > 0) {
+    setSelectedFiles((prev) => [...prev, ...newFiles])
+    if (newFiles.length > 0) {
       setSelectedPreviewFile(newFiles[0])
+      setResults([])
+      setIsAnalysisComplete(false)
+    }
+  }
+
+  const handleToggleSelectFile = (file: File) => {
+    setSelectedFiles((prev) => {
+      const exists = prev.some(
+        (f) => f === file || (f.name === file.name && f.size === file.size)
+      )
+      if (exists) {
+        return prev.filter(
+          (f) => !(f === file || (f.name === file.name && f.size === file.size))
+        )
+      } else {
+        return [...prev, file]
+      }
+    })
+  }
+
+  const handleSelectAllFiles = (selectAll: boolean) => {
+    if (selectAll) {
+      setSelectedFiles([...files])
+    } else {
+      setSelectedFiles([])
     }
   }
 
@@ -115,13 +149,21 @@ export function App() {
     const target = files[index]
     const updated = files.filter((_, i) => i !== index)
     setFiles(updated)
+    setSelectedFiles((prev) =>
+      prev.filter(
+        (f) => !(f === target || (f.name === target.name && f.size === target.size))
+      )
+    )
     if (selectedPreviewFile === target) {
       setSelectedPreviewFile(updated.length > 0 ? updated[0] : null)
+      setResults([])
+      setIsAnalysisComplete(false)
     }
   }
 
   const handleClearAll = () => {
     setFiles([])
+    setSelectedFiles([])
     setSelectedPreviewFile(null)
     setResults([])
     setErrorMessage(null)
@@ -152,7 +194,7 @@ export function App() {
 
   // First-Run Interception Trigger
   const handleRunClick = () => {
-    if (files.length === 0) return
+    if (selectedFiles.length === 0) return
 
     if (!backendOnline) {
       setIsOfflineModalOpen(true)
@@ -187,9 +229,11 @@ export function App() {
     }
   }
 
-  // Execute Asynchronous Inference across all selected models
+  // Execute Asynchronous Inference across all selected models on the selected files
   const executeInference = async () => {
-    if (files.length === 0 || selectedModelIds.length === 0) return
+    const targetFiles = selectedFiles.length > 0 ? selectedFiles : files
+    if (targetFiles.length === 0 || selectedModelIds.length === 0) return
+
     setIsAnalyzing(true)
     setIsAnalysisComplete(false)
     setErrorMessage(null)
@@ -200,13 +244,30 @@ export function App() {
       const combinedResults: PredictionResult[] = []
 
       for (const model of selectedModels) {
-        const batchRes = await apiService.predictBatch(model.endpoint, files)
+        const batchRes = await apiService.predictBatch(model.endpoint, targetFiles)
         combinedResults.push(...batchRes)
+      }
+
+      // Group results file-by-file in the original order of targetFiles
+      const orderedResults: PredictionResult[] = []
+      for (const file of targetFiles) {
+        for (const res of combinedResults) {
+          if (res.filename === file.name) {
+            orderedResults.push(res)
+          }
+        }
+      }
+
+      // Safety fallback: append any results that did not match targetFiles names directly
+      for (const res of combinedResults) {
+        if (!orderedResults.includes(res)) {
+          orderedResults.push(res)
+        }
       }
 
       setIsAnalysisComplete(true)
       setTimeout(() => {
-        setResults(combinedResults)
+        setResults(orderedResults)
         setIsAnalyzing(false)
       }, 400)
     } catch (err: any) {
@@ -258,118 +319,142 @@ export function App() {
       />
 
       {/* Main Content Sections */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <main className="flex-1 w-full mx-auto space-y-12">
         {/* Offline Warning Strip (Client Friendly) */}
         {!backendOnline && (
-          <div className="mt-4 p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-              <span>
-                {language === "th"
-                  ? "ระบบเซิร์ฟเวอร์ออฟไลน์ — ไม่สามารถเชื่อมต่อระบบประมวลผลได้ในขณะนี้"
-                  : "Server Offline — The audio inference service is currently unreachable."}
-              </span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>
+                  {language === "th"
+                    ? "ระบบเซิร์ฟเวอร์ออฟไลน์ — ไม่สามารถเชื่อมต่อระบบประมวลผลได้ในขณะนี้"
+                    : "Server Offline — The audio inference service is currently unreachable."}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOfflineModalOpen(true)}
+                className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-100 font-semibold transition-all shrink-0 cursor-pointer"
+              >
+                {language === "th" ? "ดูรายละเอียด" : "View Details"}
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsOfflineModalOpen(true)}
-              className="px-3 py-1 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 dark:text-amber-100 font-semibold transition-all shrink-0 cursor-pointer"
-            >
-              {language === "th" ? "ดูรายละเอียด" : "View Details"}
-            </button>
           </div>
         )}
 
         {/* Global Error Strip */}
         {errorMessage && (
-          <div className="mt-4 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
-              <span>{errorMessage}</span>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setErrorMessage(null)}
+                className="text-xs uppercase font-bold underline"
+              >
+                Dismiss
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setErrorMessage(null)}
-              className="text-xs uppercase font-bold underline"
-            >
-              Dismiss
-            </button>
           </div>
         )}
 
-        {/* 1. Hero Section */}
-        <Hero language={language} />
-
-        {/* 2. Asymmetrical Scrollytelling Detection Section */}
-        <section id="detection" className="py-10 space-y-8 scroll-mt-24">
-          <div className="text-center max-w-3xl mx-auto space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-              {t.sectionDetectionTitle}
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              {t.sectionDetectionSubtitle}
-            </p>
-          </div>
-
-          {/* 50/50 Asymmetrical Scrollytelling Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left Column: Sticky Audio Ingestion & Waveform */}
-            <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
-              <FileDropzone
-                files={files}
-                onFilesAdded={handleFilesAdded}
-                onFileRemoved={handleFileRemoved}
-                onClearAll={handleClearAll}
-                selectedPreviewFile={selectedPreviewFile}
-                onSelectPreviewFile={setSelectedPreviewFile}
-                isAnalyzing={isAnalyzing}
-                onRunClick={handleRunClick}
-                language={language}
-              />
-            </div>
-
-            {/* Right Column: Model Registry & Results Stream */}
-            <div className="lg:col-span-7 space-y-6">
-              {/* Model Selection Registry */}
-              <ModelSelector
-                selectedModelIds={selectedModelIds}
-                onToggleModel={handleToggleModel}
-                onSelectAll={handleSelectAllModels}
-                isHighlighted={isModelSelectorHighlighted}
-                language={language}
-              />
-
-              {/* Faux Progress Bar */}
-              <FauxProgressBar
-                isAnalyzing={isAnalyzing}
-                isComplete={isAnalysisComplete}
-                modelNames={selectedModelNames}
-                language={language}
-              />
-
-              {/* Results Stream */}
-              {results.length > 0 && (
-                <ResultsDisplay
-                  results={results}
-                  onSelectAudioForPlayback={(fname) => {
-                    const match = files.find((f) => f.name === fname)
-                    if (match) setSelectedPreviewFile(match)
-                  }}
-                  language={language}
-                />
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* 3. Historical Audit Ledger */}
-        <div className="scroll-mt-24">
-          <HistoryView language={language} />
+        {/* 1. Fixed / Sticky Parallax Intro Overview Stage */}
+        <div className="sticky top-20 z-0 h-[calc(100vh-5rem)] min-h-[580px] max-h-[850px] w-full flex items-center justify-center overflow-hidden">
+          <motion.div
+            style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          >
+            <Hero language={language} />
+          </motion.div>
         </div>
 
-        {/* 4. Technical Architectures Guide */}
-        <div className="scroll-mt-24">
-          <ModelsGuide language={language} />
+        {/* 2. Parallax Sliding Foreground Layer: Detection Lab & Subsequent Sections */}
+        <div className="relative z-20 bg-background min-h-screen border-t border-border/80 shadow-[0_-30px_70px_rgba(0,0,0,0.12)] dark:shadow-[0_-30px_70px_rgba(0,0,0,0.65)] rounded-t-[2.5rem] sm:rounded-t-[3.5rem] pt-8 pb-20">
+          {/* Subtle Decorative Pull Notch */}
+          <div className="flex justify-center -mt-4 pb-6">
+            <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30 hover:bg-primary/50 transition-colors" />
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+            {/* Detection Section */}
+            <section id="detection" className="space-y-8 scroll-mt-28">
+              <div className="text-center max-w-3xl mx-auto space-y-2">
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+                  {t.sectionDetectionTitle}
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {t.sectionDetectionSubtitle}
+                </p>
+              </div>
+
+              {/* 50/50 Asymmetrical Scrollytelling Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Left Column: Sticky Audio Ingestion & Waveform */}
+                <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
+                  <FileDropzone
+                    files={files}
+                    onFilesAdded={handleFilesAdded}
+                    onFileRemoved={handleFileRemoved}
+                    onClearAll={handleClearAll}
+                    selectedFiles={selectedFiles}
+                    onToggleSelectFile={handleToggleSelectFile}
+                    onSelectAllFiles={handleSelectAllFiles}
+                    selectedPreviewFile={selectedPreviewFile}
+                    onSelectPreviewFile={setSelectedPreviewFile}
+                    isAnalyzing={isAnalyzing}
+                    onRunClick={handleRunClick}
+                    language={language}
+                  />
+                </div>
+
+                {/* Right Column: Model Registry & Results Stream */}
+                <div className="lg:col-span-7 space-y-6">
+                  {/* Model Selection Registry */}
+                  <ModelSelector
+                    selectedModelIds={selectedModelIds}
+                    onToggleModel={handleToggleModel}
+                    onSelectAll={handleSelectAllModels}
+                    isHighlighted={isModelSelectorHighlighted}
+                    language={language}
+                  />
+
+                  {/* Faux Progress Bar */}
+                  <FauxProgressBar
+                    isAnalyzing={isAnalyzing}
+                    isComplete={isAnalysisComplete}
+                    modelNames={selectedModelNames}
+                    language={language}
+                  />
+
+                  {/* Results Stream */}
+                  {results.length > 0 && (
+                    <ResultsDisplay
+                      results={results}
+                      onSelectAudioForPlayback={(fname) => {
+                        const match = files.find((f) => f.name === fname)
+                        if (match) setSelectedPreviewFile(match)
+                      }}
+                      language={language}
+                    />
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* 3. Historical Audit Ledger */}
+            <div className="scroll-mt-24">
+              <HistoryView language={language} />
+            </div>
+
+            {/* 4. Technical Architectures Guide */}
+            <div className="scroll-mt-24">
+              <ModelsGuide language={language} />
+            </div>
+          </div>
         </div>
       </main>
 

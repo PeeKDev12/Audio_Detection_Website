@@ -24,18 +24,33 @@ except Exception:
 # ================== Audio File I/O ==================
 def read_audio(path: str) -> Tuple[Optional[np.ndarray], Optional[int]]:
     """
-    Read audio file using soundfile or FFmpeg decoding pipe to float32 mono array.
+    Read audio file using soundfile, torchaudio, or FFmpeg decoding pipe to float32 mono array.
     """
-    # Try standard soundfile first
+    if not os.path.exists(path) or os.path.getsize(path) == 0:
+        logger.error(f"Audio file {path} is missing or empty (0 bytes)")
+        return None, None
+
+    # 1. Try standard soundfile first
     try:
         data, sr = sf.read(path)
         if data.ndim > 1:
             data = np.mean(data, axis=1)
-        return data.astype(np.float32), sr
+        return data.astype(np.float32), int(sr)
     except Exception:
         pass
 
-    # Fallback to FFmpeg pipe
+    # 2. Try torchaudio backend
+    try:
+        wf, sr = torchaudio.load(path)
+        if wf.ndim > 1 and wf.shape[0] > 1:
+            wf = torch.mean(wf, dim=0)
+        else:
+            wf = wf.squeeze(0)
+        return wf.cpu().numpy().astype(np.float32), int(sr)
+    except Exception:
+        pass
+
+    # 3. Fallback to FFmpeg pipe
     try:
         ffmpeg_bin = settings.FFMPEG_PATH or "ffmpeg"
         cmd = [
@@ -49,7 +64,7 @@ def read_audio(path: str) -> Tuple[Optional[np.ndarray], Optional[int]]:
         data, sr = sf.read(buf)
         if data.ndim > 1:
             data = np.mean(data, axis=1)
-        return data.astype(np.float32), sr
+        return data.astype(np.float32), int(sr)
     except Exception as e:
         logger.error(f"Failed to read/decode audio with FFmpeg: {e}")
         return None, None

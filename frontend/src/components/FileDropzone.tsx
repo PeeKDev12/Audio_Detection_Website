@@ -1,5 +1,14 @@
 import React, { useRef, useState } from "react"
-import { UploadCloud, FileAudio, Trash2, PlayCircle, Waves, ArrowRight } from "lucide-react"
+import {
+  UploadCloud,
+  FileAudio,
+  Trash2,
+  PlayCircle,
+  Waves,
+  ArrowRight,
+  CheckSquare,
+  Square,
+} from "lucide-react"
 import { AudioWaveform } from "./AudioWaveform"
 import { type Language, translations } from "../lib/i18n"
 
@@ -8,6 +17,9 @@ interface FileDropzoneProps {
   onFilesAdded: (newFiles: File[]) => void
   onFileRemoved: (index: number) => void
   onClearAll: () => void
+  selectedFiles: File[]
+  onToggleSelectFile: (file: File) => void
+  onSelectAllFiles: (selectAll: boolean) => void
   selectedPreviewFile: File | null
   onSelectPreviewFile: (file: File) => void
   isAnalyzing: boolean
@@ -20,6 +32,9 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
   onFilesAdded,
   onFileRemoved,
   onClearAll,
+  selectedFiles,
+  onToggleSelectFile,
+  onSelectAllFiles,
   selectedPreviewFile,
   onSelectPreviewFile,
   isAnalyzing,
@@ -44,13 +59,12 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
     setIsDragOver(false)
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const validFiles = Array.from(e.dataTransfer.files).filter((f) =>
-        f.type.startsWith("audio/") || /\.(wav|mp3|flac|m4a|ogg|aac|wma)$/i.test(f.name)
+        f.type.startsWith("audio/") ||
+        /\.(wav|mp3|flac|m4a|ogg|aac|wma)$/i.test(f.name)
       )
       if (validFiles.length > 0) {
         onFilesAdded(validFiles)
-        if (!selectedPreviewFile) {
-          onSelectPreviewFile(validFiles[0])
-        }
+        onSelectPreviewFile(validFiles[0])
       }
     }
   }
@@ -59,9 +73,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       const validFiles = Array.from(e.target.files)
       onFilesAdded(validFiles)
-      if (!selectedPreviewFile) {
-        onSelectPreviewFile(validFiles[0])
-      }
+      onSelectPreviewFile(validFiles[0])
       e.target.value = ""
     }
   }
@@ -71,6 +83,9 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
   }
+
+  const isAllFilesSelected =
+    files.length > 0 && selectedFiles.length === files.length
 
   return (
     <div className="space-y-6">
@@ -143,52 +158,103 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
       {/* Ingestion Queue Card */}
       {files.length > 0 && (
         <div className="rounded-3xl p-6 bg-background border border-border space-y-4 animate-in fade-in duration-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <FileAudio className="w-4 h-4 text-primary" />
               <span className="text-sm font-bold text-foreground">
                 {t.queueTitle} ({files.length})
               </span>
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                {selectedFiles.length}/{files.length} {t.selectedFilesCount || "selected"}
+              </span>
             </div>
-            <button
-              type="button"
-              onClick={onClearAll}
-              disabled={isAnalyzing}
-              className="text-xs text-muted-foreground hover:text-rose-500 font-medium transition-colors"
-            >
-              {t.clearQueue}
-            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onSelectAllFiles(!isAllFilesSelected)}
+                disabled={isAnalyzing}
+                className="text-xs text-primary hover:underline font-medium transition-colors cursor-pointer"
+              >
+                {isAllFilesSelected
+                  ? t.deselectAllFiles || "Deselect All"
+                  : t.selectAllFiles || "Select All"}
+              </button>
+              <span className="text-border">|</span>
+              <button
+                type="button"
+                onClick={onClearAll}
+                disabled={isAnalyzing}
+                className="text-xs text-muted-foreground hover:text-rose-500 font-medium transition-colors cursor-pointer"
+              >
+                {t.clearQueue}
+              </button>
+            </div>
           </div>
 
-          <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
+          <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
             {files.map((file, idx) => {
-              const isSelected = selectedPreviewFile === file
+              const isChecked = selectedFiles.some(
+                (f) => f === file || (f.name === file.name && f.size === file.size)
+              )
+              const isPreviewActive = selectedPreviewFile === file
+
               return (
                 <div
                   key={`${file.name}-${idx}`}
                   className={`flex items-center justify-between p-3 rounded-2xl transition-all select-none border ${
-                    isSelected
-                      ? "border-primary/50 bg-primary/10 text-foreground"
-                      : "border-border/60 bg-muted/30 hover:border-border hover:bg-muted/60"
+                    isChecked
+                      ? "border-primary/40 bg-primary/5 text-foreground"
+                      : "border-border/60 bg-muted/20 hover:border-border hover:bg-muted/40 text-muted-foreground"
                   }`}
                 >
+                  {/* Left: Checkbox for batch inclusion */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToggleSelectFile(file)
+                    }}
+                    disabled={isAnalyzing}
+                    className="p-1 rounded-lg text-primary hover:bg-primary/10 transition-colors mr-2 cursor-pointer"
+                    title={isChecked ? "Exclude file" : "Select file for analysis"}
+                  >
+                    {isChecked ? (
+                      <CheckSquare className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Square className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
+
+                  {/* Center: File name and waveform preview click */}
                   <div
-                    className="flex items-center gap-3 overflow-hidden cursor-pointer flex-1"
+                    className="flex items-center gap-2.5 overflow-hidden cursor-pointer flex-1"
                     onClick={() => onSelectPreviewFile(file)}
+                    title="Click to preview waveform"
                   >
                     <PlayCircle
                       className={`w-4 h-4 shrink-0 ${
-                        isSelected ? "text-primary" : "text-muted-foreground"
+                        isPreviewActive ? "text-primary" : "text-muted-foreground"
                       }`}
                     />
                     <div className="truncate">
-                      <p className="text-xs font-semibold text-foreground truncate">{file.name}</p>
+                      <p
+                        className={`text-xs font-semibold truncate ${
+                          isPreviewActive
+                            ? "text-primary font-bold"
+                            : "text-foreground"
+                        }`}
+                      >
+                        {file.name}
+                      </p>
                       <span className="text-[10px] text-muted-foreground font-mono">
                         {formatFileSize(file.size)}
+                        {isPreviewActive ? " • Waveform Active" : ""}
                       </span>
                     </div>
                   </div>
 
+                  {/* Right: Delete button */}
                   <button
                     type="button"
                     onClick={(e) => {
@@ -196,7 +262,7 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
                       onFileRemoved(idx)
                     }}
                     disabled={isAnalyzing}
-                    className="p-1.5 rounded-xl text-muted-foreground hover:text-rose-500 border border-border/40 hover:border-rose-500/30 hover:bg-rose-500/10 transition-all ml-2"
+                    className="p-1.5 rounded-xl text-muted-foreground hover:text-rose-500 border border-border/40 hover:border-rose-500/30 hover:bg-rose-500/10 transition-all ml-2 cursor-pointer"
                     title="Remove file"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -211,10 +277,18 @@ export const FileDropzone: React.FC<FileDropzoneProps> = ({
             <button
               type="button"
               onClick={onRunClick}
-              disabled={isAnalyzing || files.length === 0}
-              className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-sm sm:text-base hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 border border-primary/30 active:scale-[0.99]"
+              disabled={isAnalyzing || selectedFiles.length === 0}
+              className="w-full py-4 px-6 rounded-2xl bg-primary text-primary-foreground font-bold text-sm sm:text-base hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 border border-primary/30 active:scale-[0.99] cursor-pointer"
             >
-              <span>{isAnalyzing ? t.runningButton : `${t.runButton} (${files.length})`}</span>
+              <span>
+                {isAnalyzing
+                  ? t.runningButton
+                  : selectedFiles.length === 1
+                  ? `${t.runButton} (${selectedFiles[0].name})`
+                  : `${t.runButton} (${selectedFiles.length} ${
+                      language === "th" ? "ไฟล์" : "files"
+                    })`}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
