@@ -1,42 +1,12 @@
 # ==========================================
-# 1. Python, Virtual Environments & Backend
+# 1. Ignored Backend & Evaluation Folders (Frontend-only Repo)
 # ==========================================
-venv*/
-.venv*/
-env*/
-.env*/
-backend/venv*/
-backend/.venv*/
-
-# Bytecode, cache, and test artifacts
-__pycache__/
-*/__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Environment variables & secrets
-.env
-.env.local
-.env.*.local
-*.pem
-*.key
-
-# SQLite Databases & runtime logs
-*.db
-*.sqlite
-*.sqlite3
-asv_project.db
-backend/asv_project.db
-*.log
+backend/
+evaluation/
 
 # ==========================================
 # 2. Machine Learning Weights & Model Checkpoints
 # ==========================================
-# Binary model weights (>100MB cannot be pushed to GitHub without Git LFS)
 *.h5
 *.hdf5
 *.pth
@@ -47,24 +17,19 @@ backend/asv_project.db
 *.ckpt
 ml_weights/
 */ml_weights/
-backend/ml_weights/
-asv_evaluator_bundle/ml_weights/
 
 # ==========================================
 # 3. Audio Datasets & Sample Files
 # ==========================================
 SLSCU CSS main data_samples/
 */SLSCU CSS main data_samples/
-evaluation/SLSCU CSS main data_samples/
 flac_E_aa/
 */flac_E_aa/
-evaluation/flac_E_aa/
 data/
 */data/
 datasets/
 */datasets/
 
-# Raw audio files (prevent accidental large audio pushes)
 *.flac
 *.wav
 *.mp3
@@ -77,9 +42,7 @@ datasets/
 # ==========================================
 eval_output/
 */eval_output/
-evaluation/eval_output/
 protocol_*_outputs/
-backend/protocol_*_outputs/
 
 # ==========================================
 # 5. Compressed Archives & Distribution Bundles
@@ -109,6 +72,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
 
 # ==========================================
 # 7. IDEs & Operating System Artifacts
