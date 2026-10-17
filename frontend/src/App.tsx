@@ -320,7 +320,8 @@ export function App() {
 
       {/* Main Content Sections */}
       <main className="flex-1 w-full mx-auto space-y-12">
-        {/* Offline Warning Strip (Client Friendly) */}
+        
+        {/* Offline Warning Strip (Client Friendly)
         {!backendOnline && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
             <div className="p-3.5 rounded-2xl bg-amber-500/10 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-4">
@@ -342,6 +343,7 @@ export function App() {
             </div>
           </div>
         )}
+        */}
 
         {/* Global Error Strip */}
         {errorMessage && (

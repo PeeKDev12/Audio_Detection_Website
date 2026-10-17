@@ -91,3 +91,159 @@
    ORM                                      │ session.py                              │ Python SQL toolkit and Object-Relational Mapper
    Database Engine                          │ SQLite (asv_project.db)                 │ Local persistent storage for prediction history and audit records
    Data Models                              │ models.py & models.py                   │ Schema tracking filename, label, confidence, and timestamp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+API:  ──────
+  ### Part 1: API Workflow in /backend
+
+  │ Diagram exceeds terminal width (257 > 156 cols)
+  │ Displayed as code block. Widen terminal to view inline.
+
+    flowchart TD
+        Client["Client / Frontend (Web App)"] -- "POST multipart/form-data (files)" --> Router["API Router (api/routes/predictions.py)"]
+        Router --> Dep["Dependency Injection (InferenceService)"]
+        Dep --> Service["InferenceService.predict_batch()"]
+
+        subgraph ProcessingPipeline ["Asynchronous Processing Loop"]
+            Service --> Threadpool["run_in_threadpool (_predict_single_sync)"]
+
+            Threadpool --> BranchCheck{"Model Type?"}
+
+            BranchCheck -- "AASIST (PyTorch)" --> AASIST_Proc["process_raw_audio_for_aasist()<br/>• 16kHz resample<br/>• 64,600 samples slicing/padding"]
+            AASIST_Proc --> TorchModel["AASIST Model Forward<br/>(GPU/CUDA or CPU)"]
+
+            BranchCheck -- "ResNet34 / LCNN (Keras/TF)" --> AudioProc["read_audio() & extract_features()<br/>• LFCC (57-dim) or MFCC (60-dim)<br/>•
+  fit_input_shape_to_model()"]
+            AudioProc --> TFModel["Keras Model Predict"]
+        end
+
+        TorchModel --> FormatVerdict["Calculate Softmax & Verdict (Real / Fake)"]
+        TFModel --> FormatVerdict
+
+        FormatVerdict --> DB["Log to SQLite DB (Prediction table)"]
+        FormatVerdict --> JSONResp["Return JSON Response List to Client"]
+
+  #### Step-by-Step Execution Flow:
+
+  1. Application Lifecycle & Model Preloading (main.py:18-35):
+      • On startup, FastAPI's lifespan handler calls init_db() to create SQLite tables and inference_service.load_models().
+      • All 8 model weights (.pth for PyTorch AASIST, .h5 for Keras ResNet34/LCNN) are loaded into system memory/GPU VRAM upfront so requests don't suffer
+      from load overhead.
+  2. Request Ingestion (predictions.py):
+      • Endpoints like /predict_aasist, /predict_lfcc_vaja, etc., receive List[UploadFile] through HTTP multipart forms.
+  3. Decoupled Thread Execution (inference_service.py):
+      • Because ML feature extraction and matrix operations are CPU/GPU-bound (synchronous), FastAPI delegates each file prediction to starlette.
+      concurrency.run_in_threadpool. This prevents audio decoding from freezing the async event loop.
+  4. Adaptive Audio Decoding & Extraction (audio_processor.py):
+      • AASIST: Directly decodes .wav, .flac, .mp3 into mono float32, resamples to 16 kHz via torchaudio.transforms.Resample, and slices/repeats to fixed
+      64,600 samples ( 4.04 seconds).
+      • Spectral Models: Extracts 57-dim LFCC or 60-dim MFCC features (static + delta + delta-delta) and pads/crops into 2D tensor grids (H, W, 1).
+  5. Inference & Auditing:
+      • Softmax yields probabilities for Fake (index 0) and Real (index 1).
+      • Successful predictions are logged into SQLite database (Prediction model) and returned to the frontend as structured JSON.
+
+  ──────
+  ### Part 2: How to Scale It Beyond Local (Accessible from Anywhere)
+
+  Currently, the backend runs as a single process on local machine (uvicorn on 127.0.0.1 / LAN 0.0.0.0) backed by a single file asv_project.db (SQLite).
+
+  To make it globally accessible, highly available, and capable of handling multiple concurrent users, follow this 3-tier scaling path:
+
+  │ Diagram exceeds terminal width (208 > 156 cols)
+  │ Displayed as code block. Widen terminal to view inline.
+
+    flowchart LR
+        subgraph Clients
+            Web["GitHub Pages Frontend<br/>(https://peekdev12.github.io/...)"]
+            Mobile["Mobile / API Consumers"]
+        end
+
+        subgraph Edge ["Edge & Security"]
+            Cloudflare["Cloudflare / Custom Domain<br/>(SSL/TLS termination, DDoS protection)"]
+            Nginx["Reverse Proxy (Nginx / Traefik / ALB)"]
+        end
+
+        subgraph Compute ["Compute & Workers (Docker / Kubernetes / Cloud Run)"]
+            API1["FastAPI Worker 1<br/>(Gunicorn + UvicornWorker)"]
+            API2["FastAPI Worker 2<br/>(GPU / High-Memory VM)"]
+            API3["FastAPI Worker N"]
+        end
+
+        subgraph StorageDB ["Scalable Storage & DB"]
+            Postgres[("PostgreSQL<br/>(Replaces SQLite)")]
+            S3[("Object Storage (S3 / R2 / GCS)<br/>(Optional Audio Archival)")]
+        end
+
+        Web & Mobile --> Cloudflare --> Nginx
+        Nginx --> API1 & API2 & API3
+        API1 & API2 & API3 --> Postgres
+        API1 & API2 & API3 -.-> S3
+  ──────
+  #### 1. Immediate / Low-Effort Way (Public Domain via Cloudflare Tunnel)
+
+  If you still want to run the models on your local GPU/PC but make it usable worldwide:
+
+  • Cloudflare Tunnel (cloudflared):
+      • Run cloudflared tunnel --url http://localhost:8000.
+      • Gives you a free public HTTPS endpoint (e.g., https://api.yourdomain.com).
+      • No router port-forwarding needed, automatic SSL, and works directly with your GitHub Pages frontend.
+      • Set VITE_API_BASE_URL=https://api.yourdomain.com in your frontend environment.
+
+  ──────
+  #### 2. Cloud Server Production Deployment (VPS or GPU Cloud)
+
+  Deploying to a cloud server (AWS EC2, Google Cloud Compute Engine, DigitalOcean, RunPod, or Hetzner):
+
+  1. Dockerize the Backend:
+      • Package the backend with system dependencies (ffmpeg, libsndfile1) and Python packages.
+      • Use multi-stage Docker builds to keep image size clean.
+  2. Replace SQLite with PostgreSQL:
+      • SQLite locks the file on concurrent writes (database is locked error under load).
+      • In config.py:30, update DATABASE_URL to point to a managed PostgreSQL instance (postgresql+psycopg2://user:password@host/db). SQLAlchemy already
+      handles this with zero query code changes.
+  3. Multi-Worker Process Manager:
+      • Replace standard single-process uvicorn main:app with Gunicorn managing Uvicorn workers:
+        gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app --bind 0.0.0.0:8000
+
+      • Note on GPU VRAM: If running on GPU, keep workers to 1–2 per GPU or use a centralized task queue to prevent out-of-memory (OOM) crashes.
+
+  ──────
+  #### 3. High-Load Enterprise Architecture (Queue-Based Processing)
+
+  When handling dozens of users uploading large audio files simultaneously:
+
+  • Asynchronous Task Queue (Celery / RQ + Redis):
+      • Audio prediction is heavy. Instead of holding HTTP connections open during multi-file batch runs:
+          1. POST /predict immediately accepts the files, pushes them to Redis/RabbitMQ, and returns a task_id.
+          2. Background worker processes (with GPU access) consume from the queue.
+          3. Client polls GET /tasks/{task_id} or listens via WebSockets/SSE for real-time progress.
+
+  • Model Decoupling / Microservices:
+      • Split AASIST (PyTorch) and LCNN (TensorFlow) into dedicated inference containers or serve them through an optimized model server like Triton
+      Inference Server or TorchServe for batching and latency reduction.
+  • CORS & Domain Binding:
+      • Update ALLOWED_ORIGINS in config.py:33-38 to include your official GitHub Pages URL (https://peekdev12.github.io).
