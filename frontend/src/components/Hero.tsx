@@ -1,11 +1,17 @@
+
 import React from "react"
 import { motion } from "framer-motion"
 import { ArrowDown } from "lucide-react"
 import { type Language, translations } from "../lib/i18n"
 import { TextAnimate } from "@/registry/magicui/text-animate"
 import { AnimatedShinyText } from "@/registry/magicui/animated-shiny-text"
-import { Terminal, TypingAnimation, AnimatedSpan } from "@/registry/magicui/terminal"
+import {
+  Terminal,
+  TypingAnimation,
+  AnimatedSpan,
+} from "@/registry/magicui/terminal"
 import { AuroraText } from "@/registry/magicui/aurora-text"
+import Starfield from "./Starfield"
 
 interface HeroProps {
   language: Language
@@ -20,11 +26,18 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
   }
 
   return (
-    <section id="home" className="py-4 md:py-6 scroll-mt-24 w-full">
-      <div className="w-full max-w-7xl mx-auto space-y-12">
+    <section
+      id="home"
+      className="relative isolate overflow-hidden min-h-screen min-h-[100svh] flex flex-col justify-center py-12 md:py-16 scroll-mt-24 w-full"
+    >
+      {/* Animated galaxy background: confined to this hero section */}
+      <Starfield />
+
+      {/* Existing hero content stays above the starfield */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto space-y-12">
         {/* 2-Column Wide Viewport Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Column: Main Hero Copy (Strictly Left-Aligned) */}
+          {/* Left Column: Main Hero Copy */}
           <motion.div
             key={`title-${language}`}
             initial={{ opacity: 0, x: -16 }}
@@ -35,11 +48,17 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground leading-[1.15]">
               {t.heroTitleLine1 && (
                 <>
-                  <TextAnimate animation="blurInUp" by="character" once as="span">
+                  <TextAnimate
+                    animation="blurInUp"
+                    by="character"
+                    once
+                    as="span"
+                  >
                     {t.heroTitleLine1}
                   </TextAnimate>{" "}
                 </>
               )}
+
               {t.heroTitleLine2 && (
                 <>
                   <AuroraText>
@@ -47,8 +66,14 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
                   </AuroraText>{" "}
                 </>
               )}
+
               {t.heroTitleLine3 && (
-                <TextAnimate animation="blurInUp" by="character" once as="span">
+                <TextAnimate
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  as="span"
+                >
                   {t.heroTitleLine3}
                 </TextAnimate>
               )}
@@ -59,7 +84,7 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             </p>
           </motion.div>
 
-          {/* Right Column: Interactive Terminal Graphic (Strictly Right-Aligned) */}
+          {/* Right Column: Interactive Terminal Graphic */}
           <motion.div
             key={`metrics-${language}`}
             initial={{ opacity: 0, x: 16 }}
@@ -67,27 +92,61 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="lg:col-span-5 xl:col-span-4 flex flex-col justify-center items-end w-full"
           >
-            <Terminal key={`terminal-${language}`} className="w-full">
+            <Terminal
+              key={`terminal-${language}`}
+              className="w-full"
+            >
               <TypingAnimation className="text-primary font-mono font-bold text-xs sm:text-sm">
-                {language === "th" ? "> เริ่มต้นการทำงานระบบ AASIST core..." : "> initializing AASIST acoustic core..."}
+                {language === "th"
+                  ? "> เริ่มต้นการทำงานระบบ AASIST core..."
+                  : "> initializing AASIST acoustic core..."}
               </TypingAnimation>
-              <AnimatedSpan delay={150} className="text-xs font-mono text-muted-foreground">
-                <span className="text-foreground font-semibold">✔ [{t.heroMetric1Label}]</span>: {t.heroMetric1Val}
+
+              <AnimatedSpan
+                delay={150}
+                className="text-xs font-mono text-muted-foreground"
+              >
+                <span className="text-foreground font-semibold">
+                  ✔ [{t.heroMetric1Label}]
+                </span>
+                : {t.heroMetric1Val}
               </AnimatedSpan>
-              <AnimatedSpan delay={250} className="text-xs font-mono text-muted-foreground">
-                <span className="text-emerald-500 font-semibold">✔ [{t.heroMetric2Label}]</span>: {t.heroMetric2Val}
+
+              <AnimatedSpan
+                delay={250}
+                className="text-xs font-mono text-muted-foreground"
+              >
+                <span className="text-emerald-500 font-semibold">
+                  ✔ [{t.heroMetric2Label}]
+                </span>
+                : {t.heroMetric2Val}
               </AnimatedSpan>
-              <AnimatedSpan delay={350} className="text-xs font-mono text-muted-foreground">
-                <span className="text-indigo-400 font-semibold">✔ [{t.heroMetric3Label}]</span>: {t.heroMetric3Val}
+
+              <AnimatedSpan
+                delay={350}
+                className="text-xs font-mono text-muted-foreground"
+              >
+                <span className="text-indigo-400 font-semibold">
+                  ✔ [{t.heroMetric3Label}]
+                </span>
+                : {t.heroMetric3Val}
               </AnimatedSpan>
-              <AnimatedSpan delay={450} className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                <span>✔ [status]</span>: {language === "th" ? "โมเดลพร้อมสำหรับการวิเคราะห์" : "AASIST GAT Model Ready"}
+
+              <AnimatedSpan
+                delay={450}
+                className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold"
+              >
+                <span>✔ [status]</span>
+                :{" "}
+                {language === "th"
+                  ? "โมเดลพร้อมสำหรับการวิเคราะห์"
+                  : "AASIST GAT Model Ready"}
               </AnimatedSpan>
             </Terminal>
           </motion.div>
         </div>
 
-        {/* Center CTA Button (Bridging Both Columns) */}
+        {/* Center CTA Button */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,18 +154,19 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
           className="pt-4 flex justify-center w-full"
         >
           <button
-            type="button"
-            onClick={scrollToDetection}
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-background text-base sm:text-lg font-bold text-foreground border border-border hover:bg-muted active:scale-[0.98] transition-all duration-200 hover:cursor-pointer"
-          >
-            <span className="text-primary text-base">✨</span>
-            <AnimatedShinyText className="inline-flex items-center justify-center font-extrabold text-foreground transition ease-out">
-              <span>{t.heroCta}</span>
-            </AnimatedShinyText>
-            <div className="p-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 group-hover:translate-y-0.5 transition-transform">
-              <ArrowDown className="w-4 h-4" />
-            </div>
-          </button>
+              type="button"
+              onClick={scrollToDetection}
+              className="group inline-flex items-center justify-center gap-3 rounded-full border border-border bg-background px-7 py-3.5 text-sm sm:text-base font-semibold text-foreground transition-colors duration-200 ease-out hover:bg-muted active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <AnimatedShinyText className="inline-flex items-center justify-center font-semibold">
+                <span>{t.heroCta}</span>
+              </AnimatedShinyText>
+
+              <ArrowDown
+                className="h-4 w-4 text-muted-foreground transition-transform duration-200 ease-out group-hover:translate-y-0.5 group-hover:text-foreground"
+                aria-hidden="true"
+              />
+            </button>
         </motion.div>
       </div>
     </section>

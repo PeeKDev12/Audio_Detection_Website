@@ -141,7 +141,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="p-2.5 rounded-xl bg-background text-foreground hover:bg-muted hover:text-primary transition-all duration-200"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              {darkMode ? <Sun className="w-4 h-4 text-000" /> : <Moon className="w-4 h-4 text-slate-700" />}
             </button>
 
             {/* Mobile Menu Button */}

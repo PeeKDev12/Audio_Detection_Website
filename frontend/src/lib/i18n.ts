@@ -262,7 +262,7 @@ export const translations = {
       "กลุ่มวิจัยปัญญาประดิษฐ์และการรู้จำเสียงพูด สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (สวทช.) ประเทศไทย",
     footerCol2Title: "เครดิตผู้พัฒนา",
     footerCredits: "พัฒนาโดย ศุภวิชญ์ สินถาวร / NECTEC Internship 2026",
-    footerCol3Title: "สถาปัตยกรรมระบบ",
+    footerCol3Title: "ติดต่อเรา",
     footerSpecs: "FastAPI Backend • PyTorch AASIST • React / Vite Frontend",
   },
 }

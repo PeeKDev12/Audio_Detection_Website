@@ -62,7 +62,6 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <span>&copy; {new Date().getFullYear()} NECTEC • All Rights Reserved.</span>
-          <span className="font-mono text-[11px] text-primary">FastAPI • PyTorch AASIST • React / Vite</span>
         </div>
       </div>
     </footer>

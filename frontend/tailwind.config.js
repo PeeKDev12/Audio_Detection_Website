@@ -48,18 +48,20 @@ export default {
       },
       boxShadow: {},
       animation: {
-        "shiny-text": "shiny-text 8s infinite",
+        "shiny-text": "shiny-text 2.5s ease-in-out infinite",
         aurora: "aurora 8s ease-in-out infinite",
       },
+
       keyframes: {
         "shiny-text": {
-          "0%, 90%, 100%": {
-            "background-position": "calc(-100% - var(--shiny-width, 100px)) 0",
+          "0%": {
+            "background-position": "calc(-100% - var(--shiny-width)) 0",
           },
-          "30%, 60%": {
-            "background-position": "calc(100% + var(--shiny-width, 100px)) 0",
+          "100%": {
+            "background-position": "calc(100% + var(--shiny-width)) 0",
           },
         },
+
         aurora: {
           "0%": {
             "background-position": "0% 50%",

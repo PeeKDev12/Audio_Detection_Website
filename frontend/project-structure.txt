@@ -1,0 +1,62 @@
+﻿frontend/
+|-- public/
+|   \-- Logo_of_NECTEC.svg
+|-- src/
+|   |-- assets/
+|   |   |-- hero.png
+|   |   |-- react.svg
+|   |   \-- vite.svg
+|   |-- components/
+|   |   |-- magicui/
+|   |   |   |-- animated-shiny-text.tsx
+|   |   |   |-- aurora-text.tsx
+|   |   |   |-- terminal.tsx
+|   |   |   \-- text-animate.tsx
+|   |   |-- ui/
+|   |   |   |-- alert-dialog.tsx
+|   |   |   \-- button.tsx
+|   |   |-- AudioWaveform.tsx
+|   |   |-- FauxProgressBar.tsx
+|   |   |-- FileDropzone.tsx
+|   |   |-- FirstRunModal.tsx
+|   |   |-- FloatingWaypointRail.tsx
+|   |   |-- Footer.tsx
+|   |   |-- Header.tsx
+|   |   |-- Hero.tsx
+|   |   |-- HistoryView.tsx
+|   |   |-- ModelSelector.tsx
+|   |   |-- ModelsGuide.tsx
+|   |   |-- Navbar.tsx
+|   |   |-- ResultsDisplay.tsx
+|   |   |-- ServerOfflineModal.tsx
+|   |   |-- SmoothCursor.tsx
+|   |   \-- Starfield.tsx
+|   |-- lib/
+|   |   |-- i18n.ts
+|   |   \-- utils.ts
+|   |-- registry/
+|   |   \-- magicui/
+|   |       |-- animated-shiny-text.ts
+|   |       |-- aurora-text.ts
+|   |       |-- terminal.ts
+|   |       \-- text-animate.ts
+|   |-- services/
+|   |   \-- api.ts
+|   |-- types/
+|   |   \-- index.ts
+|   |-- App.css
+|   |-- App.tsx
+|   |-- index.css
+|   \-- main.tsx
+|-- .gitignore
+|-- .oxlintrc.json
+|-- index.html
+|-- package.json
+|-- package-lock.json
+|-- postcss.config.js
+|-- README.md
+|-- tailwind.config.js
+|-- tsconfig.app.json
+|-- tsconfig.json
+|-- tsconfig.node.json
+\-- vite.config.ts
