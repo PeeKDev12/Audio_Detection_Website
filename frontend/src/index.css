@@ -11,7 +11,7 @@
     --card: 0 0% 100%;            /* #ffffff */
     --card-foreground: 222 47% 11%;
 
-    --primary: 221 83% 53%;       /* #3b82f6 */
+    --primary: 0 92% 30%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;   /* #f1f5f9 */
@@ -121,3 +121,18 @@ html.custom-cursor-active [role="button"] {
   animation: aurora 8s ease-in-out infinite;
 }
 
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 1s ease-out both;
+}

@@ -227,7 +227,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-foreground">{model.name}</span>
                       {model.badge && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium border border-primary/20">
+                        <span className="inline-flex items-center rounded-md bg-primary/[0.06] px-2.5 py-1 text-[11px] font-semibold tracking-wide text-primary">
                           {model.badge}
                         </span>
                       )}

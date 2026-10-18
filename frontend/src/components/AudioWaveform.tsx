@@ -36,8 +36,8 @@ export const AudioWaveform: React.FC<AudioWaveformProps> = ({
     const ws = WaveSurfer.create({
       container: containerRef.current,
       waveColor: isDark ? "#475569" : "#94a3b8",
-      progressColor: isDark ? "#60a5fa" : "#3b82f6",
-      cursorColor: isDark ? "#93c5fd" : "#2563eb",
+      progressColor: isDark ? "#530000" : "#a30707",
+      cursorColor: isDark ? "#000408" : "#010817",
       cursorWidth: 2,
       height: height,
       barWidth: 2,

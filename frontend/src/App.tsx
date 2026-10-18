@@ -13,10 +13,14 @@ import { FirstRunModal } from "./components/FirstRunModal"
 import { ServerOfflineModal } from "./components/ServerOfflineModal"
 import { SmoothCursor } from "./components/SmoothCursor"
 import { apiService } from "./services/api"
+import { localHistoryService } from "./services/localHistory"
+import type { PredictionHistoryItem } from "./types"
 import type { PredictionResult } from "./types"
 import { type Language, translations } from "./lib/i18n"
 import { AlertCircle } from "lucide-react"
 import { RetroGrid } from "./components/RetroGrid"
+
+const FIRST_RUN_STORAGE_KEY = "nectec_first_run_notice_seen"
 
 export function App() {
   // Light mode is default (false), Dark mode is soft matte (true)
@@ -41,7 +45,22 @@ export function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   
   // First-Run Interception State
-  const [hasConfirmedFirstRun, setHasConfirmedFirstRun] = useState(false)
+  const [hasConfirmedFirstRun, setHasConfirmedFirstRun] = useState(() => {
+    try {
+      return localStorage.getItem(FIRST_RUN_STORAGE_KEY) === "true"
+    } catch {
+      return false
+    }
+  })
+  const markFirstRunNoticeSeen = () => {
+    setHasConfirmedFirstRun(true)
+
+    try {
+      localStorage.setItem(FIRST_RUN_STORAGE_KEY, "true")
+    } catch (error) {
+      console.error("Could not save first-run notice state:", error)
+    }
+  }
   const [isFirstRunModalOpen, setIsFirstRunModalOpen] = useState(false)
   const [isModelSelectorHighlighted, setIsModelSelectorHighlighted] = useState(false)
 
@@ -216,17 +235,55 @@ export function App() {
   }
 
   const handleConfirmAndRun = () => {
-    setHasConfirmedFirstRun(true)
+    markFirstRunNoticeSeen()
     setIsFirstRunModalOpen(false)
     setIsModelSelectorHighlighted(false)
     executeInference()
   }
 
   const handleExploreModels = () => {
+    markFirstRunNoticeSeen()
     setIsFirstRunModalOpen(false)
+
     const el = document.getElementById("model-selector-widget")
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+  }
+
+  const saveResultsToLocalHistory = (results: PredictionResult[]) => {
+    const successfulResults = results.filter(
+      (result) =>
+        !result.error &&
+        ["real", "fake"].includes(result.label?.toLowerCase())
+    )
+
+    if (successfulResults.length === 0) return
+
+    const timestamp = new Date().toISOString()
+
+    const historyItems: PredictionHistoryItem[] = successfulResults.map(
+      (result) => ({
+        id: Date.now() + Math.random(),
+        filename: result.filename,
+        label: result.label,
+        confidence: `${result.confidence_pct}%`,
+        timestamp,
+      })
+    )
+
+    try {
+      const existingHistory = localHistoryService.getAll()
+
+      // Add new records before older records.
+      const updatedHistory = [...historyItems, ...existingHistory]
+
+      localStorage.setItem(
+        "nectec_prediction_history",
+        JSON.stringify(updatedHistory)
+      )
+    } catch (error) {
+      console.error("Failed to save prediction history locally:", error)
     }
   }
 
@@ -265,6 +322,7 @@ export function App() {
           orderedResults.push(res)
         }
       }
+      saveResultsToLocalHistory(orderedResults)
 
       setIsAnalysisComplete(true)
       setTimeout(() => {

@@ -1,6 +1,15 @@
+
 import React, { useEffect, useState } from "react"
-import { History, Search, Trash2, RefreshCw, ShieldCheck, ShieldAlert, ChevronDown } from "lucide-react"
-import { apiService } from "../services/api"
+import {
+  History,
+  Search,
+  Trash2,
+  RefreshCw,
+  ShieldCheck,
+  ShieldAlert,
+  ChevronDown,
+} from "lucide-react"
+import { localHistoryService } from "../services/localHistory"
 import type { PredictionHistoryItem } from "../types"
 import { type Language, translations } from "../lib/i18n"
 
@@ -14,40 +23,20 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
   const [history, setHistory] = useState<PredictionHistoryItem[]>([])
   const [loading, setLoading] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
-  const [offset, setOffset] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [searchQuery, setSearchQuery] = useState("")
   const [filterLabel, setFilterLabel] = useState<"ALL" | "Real" | "Fake">("ALL")
+
   const t = translations[language]
 
-  const fetchInitialHistory = async () => {
+  const fetchInitialHistory = () => {
     setLoading(true)
+
     try {
-      const data = await apiService.getHistory(PAGE_SIZE, 0)
-      setHistory(data)
-      setOffset(data.length)
-      setHasMore(data.length === PAGE_SIZE)
-    } catch (err) {
-      console.error("Failed to fetch prediction history:", err)
+      setHistory(localHistoryService.getAll())
+      setVisibleCount(PAGE_SIZE)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleSeeMore = async () => {
-    if (loadingMore || !hasMore) return
-    setLoadingMore(true)
-    try {
-      const nextBatch = await apiService.getHistory(PAGE_SIZE, offset)
-      if (nextBatch.length > 0) {
-        setHistory((prev) => [...prev, ...nextBatch])
-        setOffset((prev) => prev + nextBatch.length)
-      }
-      setHasMore(nextBatch.length === PAGE_SIZE)
-    } catch (err) {
-      console.error("Failed to load more history:", err)
-    } finally {
-      setLoadingMore(false)
     }
   }
 
@@ -55,27 +44,42 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
     fetchInitialHistory()
   }, [])
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     try {
-      await apiService.deleteHistoryItem(id)
+      localHistoryService.delete(id)
       setHistory((prev) => prev.filter((item) => item.id !== id))
     } catch (err) {
-      console.error("Failed to delete history record:", err)
+      console.error("Failed to delete local history record:", err)
     }
   }
 
   const filteredHistory = history.filter((item) => {
-    const matchesSearch = item.filename.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = item.filename
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+
+    const label = item.label.toLowerCase()
     const matchesFilter =
       filterLabel === "ALL" ||
-      (filterLabel === "Real" && item.label.toLowerCase() === "real") ||
-      (filterLabel === "Fake" && item.label.toLowerCase() === "fake")
+      (filterLabel === "Real" && label === "real") ||
+      (filterLabel === "Fake" && label === "fake")
+
     return matchesSearch && matchesFilter
   })
 
+  const visibleHistory = filteredHistory.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredHistory.length
+
+  const handleSeeMore = () => {
+    if (loadingMore || !hasMore) return
+
+    setLoadingMore(true)
+    setVisibleCount((prev) => prev + PAGE_SIZE)
+    setLoadingMore(false)
+  }
+
   return (
     <section id="history" className="py-12 space-y-6">
-      {/* Header & Refresh */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
@@ -93,12 +97,13 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
           disabled={loading}
           className="px-4 py-2 rounded-xl border border-border/80 bg-card/60 hover:bg-secondary/40 text-xs font-semibold text-foreground transition-all flex items-center gap-2 self-start sm:self-auto"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw
+            className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
+          />
           <span>{t.refreshLogs}</span>
         </button>
       </div>
 
-      {/* Toolbar: Search and Filter Tabs */}
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <div className="relative flex-1 w-full">
           <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -123,6 +128,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
           >
             {t.filterAll} ({history.length})
           </button>
+
           <button
             type="button"
             onClick={() => setFilterLabel("Real")}
@@ -132,8 +138,11 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
                 : "bg-card/60 border-border/80 text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t.filterReal}
+            {t.filterReal} (
+            {history.filter((item) => item.label.toLowerCase() === "real").length}
+            )
           </button>
+
           <button
             type="button"
             onClick={() => setFilterLabel("Fake")}
@@ -143,18 +152,19 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
                 : "bg-card/60 border-border/80 text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t.filterFake}
+            {t.filterFake} (
+            {history.filter((item) => item.label.toLowerCase() === "fake").length}
+            )
           </button>
         </div>
       </div>
 
-      {/* History Table Container (Flat Data Layout) */}
       <div className="rounded-2xl border border-border/80 bg-card/40 overflow-hidden">
         {loading ? (
-          <div className="p-10 text-center text-xs text-muted-foreground animate-pulse">
-            Fetching history logs from database...
+          <div className="p-10 text-center text-xs text-muted-foreground">
+            {language === "th" ? "กำลังโหลดประวัติ..." : "Loading history..."}
           </div>
-        ) : filteredHistory.length === 0 ? (
+        ) : visibleHistory.length === 0 ? (
           <div className="p-10 text-center text-xs text-muted-foreground">
             {t.emptyHistory}
           </div>
@@ -171,37 +181,55 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
                   <th className="px-4 py-3 text-right">{t.tableAction}</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-border/40 font-medium">
-                {filteredHistory.map((item) => {
+                {visibleHistory.map((item) => {
                   const isReal = item.label.toLowerCase() === "real"
+
                   return (
-                    <tr key={item.id} className="hover:bg-secondary/20 transition-colors">
-                      <td className="px-4 py-3.5 font-mono text-muted-foreground">#{item.id}</td>
-                      <td className="px-4 py-3.5 text-foreground max-w-xs truncate font-semibold">{item.filename}</td>
+                    <tr
+                      key={item.id}
+                      className="hover:bg-secondary/20 transition-colors"
+                    >
+                      <td className="px-4 py-3.5 font-mono text-muted-foreground">
+                        #{item.id}
+                      </td>
+
+                      <td className="px-4 py-3.5 text-foreground max-w-xs truncate font-semibold">
+                        {item.filename}
+                      </td>
+
                       <td className="px-4 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold border ${
+                          className={`inline-flex items-center px-3 py-1 rounded-[3px] text-[11px] font-semibold tracking-wide ${
                             isReal
-                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
-                              : "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400"
+                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "bg-primary/10 text-primary"
                           }`}
                         >
-                          {isReal ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldAlert className="w-3.5 h-3.5" />}
-                          {item.label}
+                          {isReal ? "Bonafide" : "Spoofed"}
                         </span>
+
                       </td>
+
                       <td className="px-4 py-3.5 font-mono font-bold text-foreground">
                         {item.confidence}
                       </td>
+
                       <td className="px-4 py-3.5 text-muted-foreground text-xs font-mono">
                         {new Date(item.timestamp).toLocaleString()}
                       </td>
+
                       <td className="px-4 py-3.5 text-right">
                         <button
                           type="button"
                           onClick={() => handleDelete(item.id)}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition-all"
-                          title="Delete Record"
+                          title={
+                            language === "th"
+                              ? "ลบประวัติ"
+                              : "Delete Record"
+                          }
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -214,15 +242,14 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
           </div>
         )}
 
-        {/* Paginated "See More" Button */}
-        {history.length > 0 && (
+        {filteredHistory.length > 0 && (
           <div className="p-4 bg-secondary/10 border-t border-border/60 text-center">
             {hasMore ? (
               <button
                 type="button"
                 onClick={handleSeeMore}
                 disabled={loadingMore}
-                className="px-6 py-2.5 rounded-xl border border-border/80 bg-card/80 hover:bg-secondary/40 text-xs font-bold text-foreground transition-all inline-flex items-center gap-2 hover:scale-[1.02]"
+                className="px-6 py-2.5 rounded-xl border border-border/80 bg-card/80 hover:bg-secondary/40 text-xs font-bold text-foreground inline-flex items-center gap-2"
               >
                 {loadingMore ? (
                   <>
@@ -238,7 +265,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ language }) => {
               </button>
             ) : (
               <span className="text-xs text-muted-foreground font-medium">
-                {t.noMoreHistory} ({history.length} records)
+                {t.noMoreHistory} ({filteredHistory.length} records)
               </span>
             )}
           </div>

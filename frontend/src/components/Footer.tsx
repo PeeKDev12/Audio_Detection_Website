@@ -16,9 +16,13 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
           {/* Col 1 */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-base text-primary">
-                NECTEC
-              </span>
+            <div>
+              <img
+                alt="NECTEC Logo"
+                className="h-10 w-auto object-contain"
+                src="/Logo_of_NECTEC.svg"
+              />
+            </div>
               <span className="text-xs font-semibold text-foreground">
                 • Audio AI & Biometrics Lab
               </span>
@@ -29,19 +33,6 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
           </div>
 
           {/* Col 2 */}
-          <div className="space-y-2 text-xs text-muted-foreground">
-            <h4 className="font-bold text-foreground text-sm mb-2">{t.footerCol2Title}</h4>
-            <div className="p-4 rounded-2xl bg-muted/40 border border-border">
-              <p className="font-bold text-foreground">
-                {t.footerCredits}
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Audio Deepfake & Synthetic Voice Detection Web Application
-              </p>
-            </div>
-          </div>
-
-          {/* Col 3 */}
           <div className="space-y-2 text-xs text-muted-foreground">
             <h4 className="font-bold text-foreground text-sm mb-2">{t.footerCol3Title}</h4>
             <p className="flex items-center gap-2">
@@ -56,6 +47,19 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
               <Globe className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>www.nectec.or.th</span>
             </p>
+          </div>
+
+          {/* Column 3 naja eiei*/}
+          <div className="w-full">
+            <h5 className="font-bold text-foreground text-sm mb-2">Our Location</h5>
+            <iframe
+              src="https://maps.google.com/maps?q=NECTEC%2C%20112%20Phahonyothin%20Road%2C%20Khlong%20Luang%2C%20Pathum%20Thani&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-48 rounded-lg shadow-sm border-0"
+              allowFullScreen={false}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="NECTEC Location"
+            ></iframe>
           </div>
         </div>
 
