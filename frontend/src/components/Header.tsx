@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   ]
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md border-b border-border transition-all duration-300">
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Left: NECTEC SVG Logo clearly visible */}
@@ -134,15 +134,22 @@ export const Header: React.FC<HeaderProps> = ({
                 TH
               </button>
             </div>
-
-            {/* Dark/Light Flat Switch */}
+            
+            <button
+              disabled
+              className="p-2.5 rounded-xl bg-background text-foreground opacity-50 cursor-not-allowed"
+              title="Dark mode is currently in development"
+            >
+              {darkMode ? <Sun className="w-4 h-4 text-000" /> : <Moon className="w-4 h-4 text-slate-700" />}
+            </button>
+            {/* Dark/Light Flat Switch 
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="p-2.5 rounded-xl bg-background text-foreground hover:bg-muted hover:text-primary transition-all duration-200"
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {darkMode ? <Sun className="w-4 h-4 text-000" /> : <Moon className="w-4 h-4 text-slate-700" />}
-            </button>
+            </button>*/}
 
             {/* Mobile Menu Button */}
             <button

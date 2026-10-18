@@ -16,6 +16,7 @@ import { apiService } from "./services/api"
 import type { PredictionResult } from "./types"
 import { type Language, translations } from "./lib/i18n"
 import { AlertCircle } from "lucide-react"
+import { RetroGrid } from "./components/RetroGrid"
 
 export function App() {
   // Light mode is default (false), Dark mode is soft matte (true)
@@ -366,9 +367,18 @@ export function App() {
 
         {/* 1. Fixed / Sticky Parallax Intro Overview Stage */}
         <div className="sticky top-20 z-0 h-[calc(100vh-5rem)] min-h-[580px] max-h-[850px] w-full flex items-center justify-center overflow-hidden">
+          {/* Background stays outside the scaling motion wrapper */}
+          <RetroGrid
+            className="z-0 translate-y-40"
+            angle={60}
+            cellSize={60}
+            opacity={0.2}
+            lightLineColor="#ffffff"
+            darkLineColor="#000000"
+          />
           <motion.div
             style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
-            className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+            className="w-full"
           >
             <Hero language={language} />
           </motion.div>

@@ -44,7 +44,7 @@
 |   |   \-- api.ts
 |   |-- types/
 |   |   \-- index.ts
-|   |-- App.css
+|   |
 |   |-- App.tsx
 |   |-- index.css
 |   \-- main.tsx

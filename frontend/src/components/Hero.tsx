@@ -11,7 +11,6 @@ import {
   AnimatedSpan,
 } from "@/registry/magicui/terminal"
 import { AuroraText } from "@/registry/magicui/aurora-text"
-import Starfield from "./Starfield"
 
 interface HeroProps {
   language: Language
@@ -30,11 +29,10 @@ export const Hero: React.FC<HeroProps> = ({ language }) => {
       id="home"
       className="relative isolate overflow-hidden min-h-screen min-h-[100svh] flex flex-col justify-center py-12 md:py-16 scroll-mt-24 w-full"
     >
-      {/* Animated galaxy background: confined to this hero section */}
-      <Starfield />
+
 
       {/* Existing hero content stays above the starfield */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto space-y-12">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* 2-Column Wide Viewport Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Main Hero Copy */}

@@ -44,8 +44,8 @@ export const ServerOfflineModal: React.FC<ServerOfflineModalProps> = ({
     <AlertDialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent size="default">
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-amber-500/10 text-amber-500 border-amber-500/20">
-            <WifiOff className="w-5 h-5 text-amber-500" />
+          <AlertDialogMedia className="bg-[#950606]/10 text-[#950606] border-[#950606]/20">
+            <WifiOff className="w-5 h-5 text-[#950606]" />
           </AlertDialogMedia>
           <div className="space-y-1">
             <AlertDialogTitle className="text-foreground">
@@ -64,7 +64,7 @@ export const ServerOfflineModal: React.FC<ServerOfflineModalProps> = ({
           <AlertDialogAction
             onClick={handleRetry}
             disabled={isRetrying}
-            className="bg-amber-500 hover:bg-amber-600 text-white border-amber-600/30"
+            className="bg-[#950606] hover:bg-[#750505] text-white border-[#950606]/30"
           >
             <RefreshCw
               className={`w-3.5 h-3.5 ${isRetrying ? "animate-spin" : ""}`}
